@@ -78,13 +78,14 @@
 /* Controllers */
 .cmIcon{
     width:50% !important;
+    max-width:160px;
     height:auto;
 }
 
 .doorState,
 .powerState{
     position:relative;
-    height:300px;
+    height:180px;
     
     &>div{
         height:100%;
