@@ -1,0 +1,43 @@
+{
+  "name": "pwells-homecontrol",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "next start",
+    "build": "next build && next export",
+    "build:stage": "sh -ac '. ./.env.staging; next build && next export'",
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && rm -rf .next/ && npm install && npm run dev",
+    "compile:scss": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js assets/scss/style.scss assets/css/style.css",
+    "minify:scss": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js assets/scss/style.scss assets/css/style.min.css --output-style compressed",
+    "map:scss": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js assets/scss/style.scss assets/css/style.css --source-map true",
+    "build:scss": "npm run compile:scss && npm run minify:scss && npm run map:scss",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/pro-light-svg-icons": "^5.15.3",
+    "@fortawesome/pro-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "bootstrap": "^4.6.0",
+    "classnames": "^2.2.6",
+    "next": "^10.0.6",
+    "next-compose-plugins": "^2.2.1",
+    "next-fonts": "^1.4.0",
+    "next-images": "^1.3.1",
+    "next-pwa": "^5.2.24",
+    "next-transpile-modules": "^6.1.0",
+    "node-sass": "^4.14.1",
+    "node-sass-package-importer": "^5.3.2",
+    "path": "^0.12.7",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-perfect-scrollbar": "^1.5.8",
+    "reactstrap": "^8.9.0",
+    "webpack": "^4.46.0"
+  },
+  "optionalDependencies": {},
+  "repository": {
+    "type": "git"
+  }
+}
