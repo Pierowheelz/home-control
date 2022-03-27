@@ -25,17 +25,14 @@ class Page extends Component {
                 <SimpleHeader />
                 <Container className="mt--6" fluid>
                     <Row>
-                        <Col md="6" lg="6" xl="4">
-                            <Lights deviceId="10004baf3d" />
+                        <Col sm="12" md="4" lg="4" xl="4">
+                            <Vent deviceId="0" title="Peter's Room" />
                         </Col>
-                        <Col md="6" lg="6" xl="4">
-                            <Blinds />
+                        <Col sm="12" md="4" lg="4" xl="4">
+                            <Vent deviceId="1" title="Burton's Room" />
                         </Col>
-                        <Col md="6" lg="6" xl="4">
-                            <Vent deviceId="0" title="AC Vent" />
-                        </Col>
-                        <Col md="6" lg="6" xl="4">
-                            <Speakers />
+                        <Col sm="12" md="4" lg="4" xl="4">
+                            <Vent deviceId="2" title="Guest Room" />
                         </Col>
                     </Row>
                 </Container>

@@ -7,6 +7,9 @@ import Head from "next/head";
 // core styles
 import "assets/scss/style.scss?v1.1.0";
 
+//Range Slider
+import 'react-rangeslider/lib/index.css'
+
 // Page change animation
 //import PageChange from "components/PageChange/PageChange.js";
 

@@ -18,7 +18,7 @@
             "src": "/icons/favicon_256.png",
             "type": "image/png",
             "sizes": "256x256"
-        },
+        }
     ],
     "scope": "/",
     "start_url": "/",

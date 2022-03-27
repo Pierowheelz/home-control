@@ -18,7 +18,7 @@ import WbSession from "classes/Session.jsx";
 import SimpleHeader from "components/Headers/SimpleHeader.js";
 import LinkCard from "components/Features/LinkCard.jsx";
 
-import { faBedEmpty, faGarage, faBlinds, faComputerSpeaker } from '@fortawesome/pro-light-svg-icons';
+import { faBedEmpty, faGarage, faBlinds, faComputerSpeaker, faWind } from '@fortawesome/pro-light-svg-icons';
 
 class HomePage extends Component {
     static contextType = WbSession;
@@ -47,8 +47,11 @@ class HomePage extends Component {
                                 <LinkCard title="Bedroom 1" button="Control Devices" icon={faBedEmpty} className="bg-gradient-info" />
                             </Col>
                         ) : null}
-                    </Row>
-                    <Row>
+                        {1 == this.context.getUserId() ? (
+                            <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("bedroom0");}}>
+                                <LinkCard title="Master Bedroom" button="Control Devices" icon={faBedEmpty} className="bg-gradient-info" />
+                            </Col>
+                        ) : null}
                         {0 == this.context.getUserId() ? (
                             <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("blinds");}}>
                                 <LinkCard title="Blinds" button="Control Blinds" icon={faBlinds} className="bg-gradient-default" />
@@ -59,6 +62,9 @@ class HomePage extends Component {
                                 <LinkCard title="Speakers" button="Control Speakers" icon={faComputerSpeaker} className="bg-gradient-info" />
                             </Col>
                         ) : null}
+                        <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("vents");}}>
+                            <LinkCard title="AC Vents" button="Control Vents" icon={faWind} className="bg-gradient-primary" />
+                        </Col>
                     </Row>
                 </Container>
             </>

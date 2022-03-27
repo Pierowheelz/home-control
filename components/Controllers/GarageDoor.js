@@ -43,6 +43,8 @@ class GarageDoor extends Component {
     }
     
     componentDidMount() {
+        this.fetchDoorState();
+        
         this.intervalTimer = setInterval(() => this.tick(), this.defaultInterval);
     }
 
@@ -121,10 +123,6 @@ class GarageDoor extends Component {
             // Door triggered
             triggered,
         } = this.state;
-        
-        if( 'unknown' == doorState && !loading ){
-            this.fetchDoorState();
-        }
         
         return (
             <Card className="border-0">

@@ -126,6 +126,8 @@ class Login extends Component {
                 errorMsg = 'Error connecting to server';
             } else if( session.code && session.message ){
                 errorMsg = session.message;
+            } else if( session.code ){
+                errorMsg = session.code;
             }
             //handle error messages
             this.setState({loading:false, error:true, errorMsg, errorFld});

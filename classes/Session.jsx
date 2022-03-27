@@ -69,7 +69,7 @@ class Session {
         this.is_logging_in = false;
         //console.log(ret);
         return ret;
-    }
+    };
     
     /**
      * Get the current user's profile details
@@ -105,7 +105,7 @@ class Session {
         this.check_session(ret);
         
         return ret;
-    }
+    };
     
     register = async ( fname, lname, email, pass ) => {
         if( typeof window == "undefined" ){
@@ -138,7 +138,7 @@ class Session {
         }
         
         return ret;
-    }
+    };
     
     // getPushKey = async () => {
     //     const response = await fetch(
@@ -163,7 +163,7 @@ class Session {
     //         this.push_key = ret.key;
     //     }
     //     return this.push_key;
-    // }
+    // };
     
     // subscribeToPush = async ( key ) => {
     //     const subscription = await wbPush.subscribeUser( key );
@@ -196,11 +196,11 @@ class Session {
     //     } else {
     //         console.log( ret );
     //     }
-    // }
+    // };
     //
     // unSubscribeToPush = async () => {
     //     await wbPush.unSubscribe();
-    // }
+    // };
     
     /**
      * Validate a session to ensure it's not expired
@@ -253,7 +253,7 @@ class Session {
         }
         
         return valid;
-    }
+    };
     
     /**
      * Gets Garage Door state.
@@ -284,7 +284,7 @@ class Session {
         this.check_session(ret);
         
         return ret;
-    }
+    };
     
     /**
      * Triggers the garage door button
@@ -315,7 +315,7 @@ class Session {
         this.check_session(ret);
         
         return ret;
-    }
+    };
     
     /**
      * Gets Speakers state.
@@ -346,7 +346,7 @@ class Session {
         this.check_session(ret);
         
         return ret;
-    }
+    };
     
     /**
      * Turn speakers on/off
@@ -377,7 +377,7 @@ class Session {
         this.check_session(ret);
         
         return ret;
-    }
+    };
     
     /**
      * Gets Lights state.
@@ -408,7 +408,7 @@ class Session {
         this.check_session(ret);
         
         return ret;
-    }
+    };
     
     /**
      * Turn speakers on/off
@@ -441,7 +441,7 @@ class Session {
         this.check_session(ret);
         
         return ret;
-    }
+    };
     
     /**
      * Turn speakers on/off
@@ -472,7 +472,80 @@ class Session {
         this.check_session(ret);
         
         return ret;
-    }
+    };
+    
+    /**
+     * Gets Vents state.
+     */
+    getVentsState = async () => {
+        if( typeof window == "undefined" ){
+            return false;
+        }
+        
+        const response = await fetch(
+            this.url + "/vents",
+            {
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this.session_id,
+                },
+                method: 'get',
+                redirect: 'follow',
+                referrer: 'no-referrer'
+            }
+        ).catch(this._handleOffline);
+        
+        let ret = response;
+        if( typeof ret.json == "function" ){
+            ret = await response.json();
+        }
+        this.check_session(ret);
+        
+        if( ret.status ){
+            const updateEvent = new CustomEvent( 'ventsupdate', {detail:ret.status} );
+            document.dispatchEvent(updateEvent);
+        }
+        
+        return ret;
+    };
+    
+    /**
+     * Move vent to position
+     */
+    moveVent = async ( deviceId, position ) => {
+        if( typeof window == "undefined" ){
+            return false;
+        }
+        
+        const response = await fetch(
+            this.url + "/vents/"+deviceId+"/"+position,
+            {
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this.session_id,
+                },
+                method: 'post',
+                redirect: 'follow',
+                referrer: 'no-referrer',
+                body: ''
+            }
+        ).catch(this._handleOffline);
+        
+        let ret = response;
+        if( typeof ret.json == "function" ){
+            ret = await response.json();
+        }
+        this.check_session(ret);
+        
+        if( ret.status ){
+            const updateEvent = new CustomEvent( 'ventsupdate', {detail:ret.status} );
+            document.dispatchEvent(updateEvent);
+        }
+        
+        return ret;
+    };
     
     _handleOffline = (err) => {
         if( typeof window == "undefined" ){

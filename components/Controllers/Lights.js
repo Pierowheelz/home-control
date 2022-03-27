@@ -26,7 +26,7 @@ class Light extends Component {
     debug = false;
     state = {
         // Data from server
-        powerState: 'unknown', // 'on', 'off' (or 'unknown')
+        powerState: 'off', // 'on', 'off' (or 'unknown')
         loading: false, //loading screen
         error: false,
         errorMsg: "",
@@ -40,6 +40,7 @@ class Light extends Component {
     }
     
     componentDidMount() {
+        this.fetchPowerState();
         this.intervalTimer = setInterval(() => this.tick(), this.defaultInterval);
     }
 
@@ -80,10 +81,10 @@ class Light extends Component {
     
     togglePower = async () => {
         const { loading, powerState } = this.state;
-        if( loading ){
-            console.warn('Lights already loading - aborted.');
-            return;
-        }
+        // if( loading ){
+        //     console.warn('Lights already loading - aborted.');
+        //     return;
+        // }
         
         this.setState({ loading: true });
         
@@ -122,10 +123,6 @@ class Light extends Component {
         } = this.state;
         
         const { title } = this.props;
-        
-        if( 'unknown' == powerState && !loading ){
-            this.fetchPowerState();
-        }
         
         return (
             <Card className="border-0">
