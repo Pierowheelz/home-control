@@ -1,4 +1,4 @@
-## Builders App for AH Mcmahon Builders
+## Home Control App
 A ReactJS webapp based on the NextJS Argon Dashboard PRO boilderplate from Creative Tim. Uses NextJS for routing. All routes are found under the pages/ directory.
 
 #### Development Quick Start
