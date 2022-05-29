@@ -24,6 +24,7 @@ module.exports = withPWA(withFonts(
         env: {
             'public_url': process.env.PUBLIC_URL,
             'api_url': process.env.REACT_APP_ENDPOINT_URL,
+            'api_bak_url': process.env.REACT_APP_ENDPOINT_URL_BAK
         },
         pwa: {
             dest: 'public',
