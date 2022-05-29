@@ -17,7 +17,7 @@ import WbSession from "classes/Session.jsx";
 
 // Icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGarage, faGarageOpen, faGarageCar, faQuestionSquare } from '@fortawesome/pro-solid-svg-icons';
+import { faGarage, faGarageOpen, faGarageCar, faQuestionSquare, faWifiSlash } from '@fortawesome/pro-solid-svg-icons';
 
 class GarageDoor extends Component {
     static contextType = WbSession;
@@ -155,7 +155,14 @@ class GarageDoor extends Component {
                                 <Spinner color="primary" />
                                 <p></p>
                             </div>
-                        ) : (<></>)}
+                        ) : (<>
+                            {error ? (
+                                <div className="doorStateLoader text-center">
+                                    <FontAwesomeIcon className="cmError" icon={faWifiSlash} />
+                                    <p></p>
+                                </div>
+                            ) : null}
+                        </>)}
                         <p className="text-align-centre">The door is: {doorState}</p>
                     </div>
                     <div className="text-align-centre">

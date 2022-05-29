@@ -76,7 +76,7 @@ class Vent extends Component {
         console.log('Vents state response: ',response);
         
         const success = response.success ?? false;
-        const error = response.error ?? '';
+        const error = response.error ?? false;
         
         let newState = {loading: false, error: false, errorMsg: ''};
         if( !success || error ){
@@ -115,7 +115,7 @@ class Vent extends Component {
         console.log('Move Vent response: ',response);
         
         const success = response.success ?? false;
-        const error = response.error ?? '';
+        const error = response.error ?? false;
         
         let newState = {loading: false, error: false, errorMsg: ''};
         if( !success || error ){
@@ -188,7 +188,14 @@ class Vent extends Component {
                                 <Spinner color="primary" />
                                 <p></p>
                             </div>
-                        ) : (<></>)}
+                        ) : (<>
+                            {error ? (
+                                <div className="doorStateLoader text-center">
+                                    <FontAwesomeIcon className="cmError" icon={faWifiSlash} />
+                                    <p></p>
+                                </div>
+                            ) : null}
+                        </>)}
                         <p className="text-align-centre">{position}%</p>
                     </div>
                     <Slider

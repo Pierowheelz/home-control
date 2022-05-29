@@ -17,7 +17,7 @@ import WbSession from "classes/Session.jsx";
 
 // Icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faVolume, faVolumeSlash, faQuestionSquare } from '@fortawesome/pro-solid-svg-icons';
+import { faVolume, faVolumeSlash, faQuestionSquare, faWifiSlash } from '@fortawesome/pro-solid-svg-icons';
 
 class Speakers extends Component {
     static contextType = WbSession;
@@ -43,6 +43,7 @@ class Speakers extends Component {
     }
     
     componentDidMount() {
+        this.fetchPowerState();
         this.intervalTimer = setInterval(() => this.tick(), this.defaultInterval);
     }
 
@@ -127,10 +128,6 @@ class Speakers extends Component {
             triggered,
         } = this.state;
         
-        if( 'unknown' == powerState && !loading ){
-            this.fetchPowerState();
-        }
-        
         return (
             <Card className="border-0">
                 <CardHeader>
@@ -158,7 +155,14 @@ class Speakers extends Component {
                                 <Spinner color="primary" />
                                 <p></p>
                             </div>
-                        ) : (<></>)}
+                        ) : (<>
+                            {error ? (
+                                <div className="doorStateLoader text-center">
+                                    <FontAwesomeIcon className="cmError" icon={faWifiSlash} />
+                                    <p></p>
+                                </div>
+                            ) : null}
+                        </>)}
                         <p className="text-align-centre">Speakers are: {powerState}</p>
                     </div>
                     <div className="text-align-centre">

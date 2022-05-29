@@ -18,7 +18,7 @@ import WbSession from "classes/Session.jsx";
 
 // Icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLightbulbOn, faLightbulbSlash, faLightbulbExclamation } from '@fortawesome/pro-solid-svg-icons';
+import { faLightbulbOn, faLightbulbSlash, faLightbulb, faWifiSlash } from '@fortawesome/pro-solid-svg-icons';
 
 class Light extends Component {
     static contextType = WbSession;
@@ -62,7 +62,7 @@ class Light extends Component {
         console.log('Lights state response: ',response);
         
         const success = response.success ?? false;
-        const error = response.error ?? '';
+        const error = response.error ?? false;
         const reqStatus = response.status ?? 'error';
         const newStatus = response.state ?? 'unknown';
         
@@ -98,7 +98,7 @@ class Light extends Component {
         console.log('Lights toggle response: ',response);
         
         const success = response.success ?? false;
-        const error = response.error ?? '';
+        const error = response.error ?? false;
         const reqStatus = response.status ?? 'error';
         const newStatus = response.state ?? 'unknown';
         
@@ -140,7 +140,7 @@ class Light extends Component {
                                     <FontAwesomeIcon className="cmIcon" icon={faLightbulbSlash} />
                                 ) : (
                                     <>
-                                    <FontAwesomeIcon className="cmIcon" icon={faLightbulbExclamation} />
+                                    <FontAwesomeIcon className="cmIcon" icon={faLightbulb} />
                                     </>
                                 )}
                                 </>
@@ -151,7 +151,14 @@ class Light extends Component {
                                 <Spinner color="primary" />
                                 <p></p>
                             </div>
-                        ) : (<></>)}
+                        ) : (<>
+                            {error ? (
+                                <div className="doorStateLoader text-center">
+                                    <FontAwesomeIcon className="cmError" icon={faWifiSlash} />
+                                    <p></p>
+                                </div>
+                            ) : null}
+                        </>)}
                         <p className="text-align-centre">Lights are: {powerState}</p>
                     </div>
                     <div className="text-align-centre">
