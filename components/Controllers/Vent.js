@@ -19,7 +19,7 @@ import WbSession from "classes/Session.jsx";
 
 // Icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLightbulbOn, faLightbulbSlash, faLightbulbExclamation } from '@fortawesome/pro-solid-svg-icons';
+import { faLightbulbOn, faLightbulbSlash, faLightbulbExclamation, faWifiSlash } from '@fortawesome/pro-solid-svg-icons';
 
 class Vent extends Component {
     static contextType = WbSession;

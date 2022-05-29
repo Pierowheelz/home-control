@@ -36,7 +36,7 @@ class Session {
         }
         if( this.logging ) console.log('Attempting login');
         this.is_logging_in = true;
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/auth",
             {
                 cache: 'no-store',
@@ -87,7 +87,7 @@ class Session {
             return {success:false,code:'not_logged_in',message:"You are not logged in."};
         }
         
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/users/"+this.user_id,
             {
                 cache: 'default',
@@ -114,7 +114,7 @@ class Session {
         if( typeof window == "undefined" ){
             return false;
         }
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/users",
             {
                 cache: 'no-store',
@@ -144,7 +144,7 @@ class Session {
     };
     
     // getPushKey = async () => {
-    //     const response = await _fetchWithTimeout(
+    //     const response = await this._fetchWithTimeout(
     //         this.url + "/builders-app/v1/pushkey",
     //         {
     //             cache: 'no-store',
@@ -175,7 +175,7 @@ class Session {
     //     if( this.logging ) console.log( JSON.stringify(subscription) );
     //     //send to our server
     //
-    //     const response = await _fetchWithTimeout(
+    //     const response = await this._fetchWithTimeout(
     //         this.url + "/builders-app/v1/registerpush",
     //         {
     //             cache: 'no-store',
@@ -214,7 +214,7 @@ class Session {
         if( typeof window == "undefined" ){
             return false;
         }
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/auth/refresh",
             {
                 cache: 'no-store',
@@ -266,7 +266,7 @@ class Session {
             return false;
         }
         
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/garage",
             {
                 cache: 'no-store',
@@ -296,7 +296,7 @@ class Session {
         if( typeof window == "undefined" ){
             return false;
         }
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/garage",
             {
                 cache: 'no-store',
@@ -328,7 +328,7 @@ class Session {
             return false;
         }
         
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/speakers",
             {
                 cache: 'no-store',
@@ -358,7 +358,7 @@ class Session {
         if( typeof window == "undefined" ){
             return false;
         }
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/speakers/"+action,
             {
                 cache: 'no-store',
@@ -390,7 +390,7 @@ class Session {
             return false;
         }
         
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/estatus/"+deviceId,
             {
                 cache: 'no-store',
@@ -422,7 +422,7 @@ class Session {
         }
         const endpoint = 'eturn'+action;
         
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/"+endpoint+"/"+deviceId,
             {
                 cache: 'no-store',
@@ -453,7 +453,7 @@ class Session {
         if( typeof window == "undefined" ){
             return false;
         }
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/blinds/"+action,
             {
                 cache: 'no-store',
@@ -485,7 +485,7 @@ class Session {
             return false;
         }
         
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/vents",
             {
                 cache: 'no-store',
@@ -521,7 +521,7 @@ class Session {
             return false;
         }
         
-        const response = await _fetchWithTimeout(
+        const response = await this._fetchWithTimeout(
             this.url + "/vents/"+deviceId+"/"+position,
             {
                 cache: 'no-store',
@@ -559,7 +559,9 @@ class Session {
             controller.abort()
         }, 4000);
         
-        return fetch( url, options ).catch( async (err) => {
+        const newOptions = { ...options, signal };
+        
+        return fetch( url, newOptions ).catch( async (err) => {
             if( typeof window == "undefined" ){
                 return false;
             }
@@ -583,7 +585,7 @@ class Session {
                 //try backup server
                 if( url.includes( this.primary_url ) ){
                     const backupUrl = url.replace( this.primary_url, this.backup_url );
-                    return this._fetchWithTimeout( backupUrl, options );
+                    return await this._fetchWithTimeout( backupUrl, options );
                 }
             }
             
