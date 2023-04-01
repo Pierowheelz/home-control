@@ -632,6 +632,158 @@ class Session {
         return ret;
     };
     
+    /**
+     * Gets Server Controller state.
+     */
+    getServerState = async () => {
+        if( typeof window == "undefined" ){
+            return false;
+        }
+        
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this.session_id,
+                },
+                method: 'put',
+                redirect: 'follow',
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/server",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
+            }
+        );
+        
+        let ret = response;
+        if( typeof ret.json == "function" ){
+            ret = await response.json();
+        }
+        this.check_session(ret);
+        
+        return ret;
+    };
+    
+    /**
+     * Send an event to tell the Server to boot
+     */
+    bootServer = async () => {
+        if( typeof window == "undefined" ){
+            return false;
+        }
+        
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this.session_id,
+                },
+                method: 'post',
+                redirect: 'follow',
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/server/boot",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
+            }
+        );
+        
+        let ret = response;
+        if( typeof ret.json == "function" ){
+            ret = await response.json();
+        }
+        this.check_session(ret);
+        
+        return ret;
+    };
+    
+    /**
+     * Send an event to tell the Server to shut down
+     */
+    shutdownServer = async () => {
+        if( typeof window == "undefined" ){
+            return false;
+        }
+        
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this.session_id,
+                },
+                method: 'post',
+                redirect: 'follow',
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/server/shutdown",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
+            }
+        );
+        
+        let ret = response;
+        if( typeof ret.json == "function" ){
+            ret = await response.json();
+        }
+        this.check_session(ret);
+        
+        return ret;
+    };
+    
+    /**
+     * Send an event to tell the Server to update PreventShutdown status
+     */
+    serverTogglePreventShutdown = async ( newState ) => {
+        if( typeof window == "undefined" ){
+            return false;
+        }
+        
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this.session_id,
+                },
+                method: 'post',
+                redirect: 'follow',
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/server/preventshutdown/"+newState,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
+            }
+        );
+        
+        let ret = response;
+        if( typeof ret.json == "function" ){
+            ret = await response.json();
+        }
+        this.check_session(ret);
+        
+        return ret;
+    };
+    
     _fetchWithTimeout = (url, options) => {
         console.log('Fetch command issued: ', url);
         

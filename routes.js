@@ -14,19 +14,19 @@ const getAppRoutes = ( userId ) => {
         {
             path: "/",
             name: "Dashboard",
-            miniName: "D",
+            miniName: "Dsh",
             layout: "",
         },
         {
             path: "/garage",
             name: "Garage",
-            miniName: "G",
+            miniName: "Grg",
             layout: "",
         },
         {
             path: "/vents",
             name: "Vents",
-            miniName: "V",
+            miniName: "Vnt",
             layout: "",
         },
     ];
@@ -36,15 +36,23 @@ const getAppRoutes = ( userId ) => {
             {
                 path: "/seakers",
                 name: "Speakers",
-                miniName: "S",
+                miniName: "Spk",
                 layout: "",
             }
         );
+        // dashboardViews.push(
+        //     {
+        //         path: "/blinds",
+        //         name: "Blinds",
+        //         miniName: "B",
+        //         layout: "",
+        //     }
+        // );
         dashboardViews.push(
             {
-                path: "/blinds",
-                name: "Blinds",
-                miniName: "B",
+                path: "/server",
+                name: "Server",
+                miniName: "Srv",
                 layout: "",
             }
         );

@@ -18,7 +18,7 @@ import WbSession from "classes/Session.jsx";
 import SimpleHeader from "components/Headers/SimpleHeader.js";
 import LinkCard from "components/Features/LinkCard.jsx";
 
-import { faBedEmpty, faGarage, faBlinds, faComputerSpeaker, faWind } from '@fortawesome/pro-light-svg-icons';
+import { faBedEmpty, faGarage, faBlinds, faComputerSpeaker, faServer, faWind } from '@fortawesome/pro-light-svg-icons';
 
 class HomePage extends Component {
     static contextType = WbSession;
@@ -32,39 +32,52 @@ class HomePage extends Component {
     };
     
     render(){
-        //console.log( "User ID: ", this.context.getUserId() );
+        if( typeof window == "undefined" ){
+            return (
+                <>
+                    <SimpleHeader />
+                    <Container className="mt--6" fluid>
+                        <Row>
+                        ...loading
+                        </Row>
+                    </Container>
+                </>
+            );
+        }
+        
+        console.log( "User ID: ", this.context.getUserId() );
         
         return (
             <>
                 <SimpleHeader />
                 <Container className="mt--6" fluid>
                     <Row>
-                        <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("garage");}}>
-                            <LinkCard title="Garage" button="Control Garage" icon={faGarage} className="bg-gradient-primary" />
-                        </Col>
                         {0 == this.context.getUserId() ? (
-                            <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("bedroom1");}}>
-                                <LinkCard title="Bedroom 1" button="Control Devices" icon={faBedEmpty} className="bg-gradient-info" />
+                            <Col id="col_bedroom1" key="0" md="6" xl="3" onClick={() => {this.redirectToPage("bedroom1");}}>
+                                <LinkCard key="bedroom1" id="card_bedroom1" title="Bedroom 1" button="Control Devices" icon={faBedEmpty} className="bg-gradient-info" />
                             </Col>
                         ) : null}
                         {1 == this.context.getUserId() ? (
-                            <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("bedroom0");}}>
-                                <LinkCard title="Master Bedroom" button="Control Devices" icon={faBedEmpty} className="bg-gradient-info" />
+                            <Col id="col_bedroom0" key="1" md="6" xl="3" onClick={() => {this.redirectToPage("bedroom0");}}>
+                                <LinkCard key="bedroom0" id="card_bedroom0" title="Master Bedroom" button="Control Devices" icon={faBedEmpty} className="bg-gradient-info" />
                             </Col>
                         ) : null}
                         {0 == this.context.getUserId() ? (
-                            <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("blinds");}}>
+                            <Col id="col_server" key="2" md="6" xl="3" onClick={() => {this.redirectToPage("server");}}>
+                                <LinkCard key="server" id="card_server" title="Server" button="Control Server" icon={faServer} className="bg-gradient-dark" />
+                            </Col>
+                        ) : null}
+                        <Col id="col_vents" key="3" md="6" xl="3" onClick={() => {this.redirectToPage("vents");}}>
+                            <LinkCard key="vents" id="card_vents" title="AC Vents" button="Control Vents" icon={faWind} className="bg-gradient-primary" />
+                        </Col>
+                        <Col id="col_garage" key="4" md="6" xl="3" onClick={() => {this.redirectToPage("garage");}}>
+                            <LinkCard key="garage" id="card_garage" title="Garage" button="Control Garage" icon={faGarage} className="bg-gradient-default" />
+                        </Col>
+                        {/*0 == this.context.getUserId() ? (
+                            <Col key="5" md="6" xl="3" onClick={() => {this.redirectToPage("blinds");}}>
                                 <LinkCard title="Blinds" button="Control Blinds" icon={faBlinds} className="bg-gradient-default" />
                             </Col>
-                        ) : null}
-                        {0 == this.context.getUserId() ? (
-                            <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("speakers");}}>
-                                <LinkCard title="Speakers" button="Control Speakers" icon={faComputerSpeaker} className="bg-gradient-info" />
-                            </Col>
-                        ) : null}
-                        <Col key="0" md="6" xl="3" onClick={() => {this.redirectToPage("vents");}}>
-                            <LinkCard title="AC Vents" button="Control Vents" icon={faWind} className="bg-gradient-primary" />
-                        </Col>
+                        ) : null*/}
                     </Row>
                 </Container>
             </>

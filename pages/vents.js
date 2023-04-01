@@ -29,10 +29,10 @@ class Page extends Component {
                             <Vent deviceId="0" title="Peter's Room" />
                         </Col>
                         <Col sm="12" md="4" lg="4" xl="4">
-                            <Vent deviceId="1" title="Burton's Room" />
+                            <Vent deviceId="1" title="Burton's Room" doesRefresh={ false } />
                         </Col>
                         <Col sm="12" md="4" lg="4" xl="4">
-                            <Vent deviceId="2" title="Guest Room" />
+                            <Vent deviceId="2" title="Guest Room" doesRefresh={ false } />
                         </Col>
                     </Row>
                 </Container>

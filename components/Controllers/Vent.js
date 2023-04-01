@@ -64,6 +64,11 @@ class Vent extends Component {
     }
     
     fetchVentState = async () => {
+        const { doesRefresh } = this.props;
+        if( !doesRefresh ){ // Skip refresh for secondary vents - all vents are updated via one call to getVentsState()
+            return;
+        }
+        
         const { loading } = this.state;
         if( loading ){
             return;
@@ -85,6 +90,8 @@ class Vent extends Component {
             newState.error = true;
             newState.errorMsg = errorMsg;
         }
+        
+        //NOTE: getVentsState calls EventListener ventsupdate, which calls this.onVentUpdate()
         
         this.setState(newState);
     };
@@ -220,12 +227,14 @@ class Vent extends Component {
 
 Vent.propTypes = {
     title: PropTypes.string,
-    deviceId: PropTypes.string
+    deviceId: PropTypes.string,
+    doesRefresh: PropTypes.boolean,
 };
 
 Vent.defaultProps = {
     title: 'Vent',
-    deviceId: "0"
+    deviceId: "0",
+    doesRefresh: "false",
 }
 
 export default Vent;

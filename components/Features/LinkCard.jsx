@@ -14,10 +14,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 class LinkCard extends Component {
     
     render(){
-        const { title, onClick, button, icon, className } = this.props;
+        const { id, title, onClick, button, icon, className } = this.props;
         
         return (
-            <Card className={className+" border-0"}>
+            <Card key={id} id={id} className={className+" border-0"}>
                 <CardBody>
                     <Row>
                         <div className="col">
@@ -46,6 +46,7 @@ class LinkCard extends Component {
 }
 
 LinkCard.propTypes = {
+    id: PropTypes.string,
     title: PropTypes.string,
     icon: PropTypes.object,
     onClick: PropTypes.func,
@@ -54,6 +55,7 @@ LinkCard.propTypes = {
 };
 
 LinkCard.defaultProps = {
+    id: '',
     title: 'Link',
     onClick: ( e ) => {console.log('Button clicked');},
     button: "Click Here",
