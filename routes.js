@@ -23,6 +23,12 @@ const getAppRoutes = ( userId ) => {
             miniName: "G",
             layout: "",
         },
+        {
+            path: "/vents",
+            name: "Vents",
+            miniName: "V",
+            layout: "",
+        },
     ];
     
     if( 0 == userId ){

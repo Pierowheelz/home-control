@@ -1,13 +1,16 @@
 const withPlugins = require("next-compose-plugins");
-const withImages = require("next-images");
 const withFonts = require("next-fonts");
 const webpack = require("webpack");
 const path = require("path");
-const withPWA = require('next-pwa');
 const runtimeCaching = require('next-pwa/cache');
 
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  runtimeCaching,
+});
+
 module.exports = withPWA(withFonts(
-    withImages({
+    {
         webpack(config, options) {
             config.module.rules.push({
                 test: /\.(eot|ttf|woff|woff2)$/,
@@ -24,11 +27,7 @@ module.exports = withPWA(withFonts(
         env: {
             'public_url': process.env.PUBLIC_URL,
             'api_url': process.env.REACT_APP_ENDPOINT_URL,
-            'api_bak_url': process.env.REACT_APP_ENDPOINT_URL_BAK
-        },
-        pwa: {
-            dest: 'public',
-            runtimeCaching,
-        },
-    })
+            //'api_bak_url': process.env.REACT_APP_ENDPOINT_URL_BAK
+        }
+    }
 ));

@@ -1,5 +1,5 @@
 // ##############################
-// // // Login state and Wordpress connection
+// // // Login state and API connection
 // #############################
 import React, { createContext } from "react";
 import Storage from "classes/Storage.jsx";
@@ -12,10 +12,10 @@ class Session {
     constructor() {
         this.logging = true;
         
-        this.primary_url = process.env.api_url + "";
-        this.backup_url = process.env.api_bak_url + "";
+        //this.primary_url = process.env.api_url + "";
+        //this.backup_url = process.env.api_bak_url + "";
         
-        this.url = this.primary_url;
+        this.url = "https://pwproxy.webbird.info/index.php";//this.primary_url; //process.env.api_url +
         
         this.session_id = null;
         this.refreshToken = null;
@@ -37,18 +37,22 @@ class Session {
         if( this.logging ) console.log('Attempting login');
         this.is_logging_in = true;
         const response = await this._fetchWithTimeout(
-            this.url + "/auth",
+            this.url,
             {
                 cache: 'no-store',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: {'Content-Type': 'application/json'},
                 method: 'post',
                 redirect: 'follow',
                 referrer: 'no-referrer',
                 body: JSON.stringify({
-                    email: user,
-                    password: pass
+                    endpoint: "/auth",
+                    body: {
+                        email: user,
+                        password: pass,
+                    },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
                 })
             }
         );
@@ -88,14 +92,20 @@ class Session {
         }
         
         const response = await this._fetchWithTimeout(
-            this.url + "/users/"+this.user_id,
+            this.url,
             {
                 cache: 'default',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+this.session_id,
                 },
-                method: 'get',
+                method: 'put',
+                body: JSON.stringify({
+                    endpoint: "/users/"+this.user_id,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                }),
                 redirect: 'follow',
                 referrer: 'no-referrer'
             }
@@ -115,7 +125,7 @@ class Session {
             return false;
         }
         const response = await this._fetchWithTimeout(
-            this.url + "/users",
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
@@ -126,11 +136,18 @@ class Session {
                 redirect: 'follow',
                 referrer: 'no-referrer',
                 body: JSON.stringify({
-                    firstName: fname,
-                    lastName: lname,
-                    email: email,
-                    password: pass,
-                    permissionLevel: 1
+                    endpoint: "/users",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                    body: {
+                        firstName: fname,
+                        lastName: lname,
+                        email: email,
+                        password: pass,
+                        permissionLevel: 1
+                    },
                 })
             }
         );
@@ -151,7 +168,7 @@ class Session {
     //             headers: {
     //                 'Content-Type': 'application/json',
     //             },
-    //             method: 'get',
+    //             method: 'put',
     //             redirect: 'follow',
     //             referrer: 'no-referrer'
     //         }
@@ -215,7 +232,7 @@ class Session {
             return false;
         }
         const response = await this._fetchWithTimeout(
-            this.url + "/auth/refresh",
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
@@ -226,7 +243,14 @@ class Session {
                 redirect: 'follow',
                 referrer: 'no-referrer',
                 body: JSON.stringify({
-                    refresh_token: this.refreshToken
+                    endpoint: "/auth/refresh",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                    body: {
+                        refresh_token: this.refreshToken
+                    },
                 })
             }
         );
@@ -267,16 +291,23 @@ class Session {
         }
         
         const response = await this._fetchWithTimeout(
-            this.url + "/garage",
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this.session_id,
                 },
-                method: 'get',
+                method: 'put',
                 redirect: 'follow',
-                referrer: 'no-referrer'
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/garage",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -297,7 +328,7 @@ class Session {
             return false;
         }
         const response = await this._fetchWithTimeout(
-            this.url + "/garage",
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
@@ -307,7 +338,13 @@ class Session {
                 method: 'post',
                 redirect: 'follow',
                 referrer: 'no-referrer',
-                body: ''
+                body: JSON.stringify({
+                    endpoint: "/garage",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -329,16 +366,23 @@ class Session {
         }
         
         const response = await this._fetchWithTimeout(
-            this.url + "/speakers",
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this.session_id,
                 },
-                method: 'get',
+                method: 'put',
                 redirect: 'follow',
-                referrer: 'no-referrer'
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/speakers",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -359,7 +403,7 @@ class Session {
             return false;
         }
         const response = await this._fetchWithTimeout(
-            this.url + "/speakers/"+action,
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
@@ -369,7 +413,13 @@ class Session {
                 method: 'post',
                 redirect: 'follow',
                 referrer: 'no-referrer',
-                body: ''
+                body: JSON.stringify({
+                    endpoint: "/speakers/"+action,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -391,16 +441,23 @@ class Session {
         }
         
         const response = await this._fetchWithTimeout(
-            this.url + "/estatus/"+deviceId,
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this.session_id,
                 },
-                method: 'get',
+                method: 'put',
                 redirect: 'follow',
-                referrer: 'no-referrer'
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/estatus/"+deviceId,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -423,7 +480,7 @@ class Session {
         const endpoint = 'eturn'+action;
         
         const response = await this._fetchWithTimeout(
-            this.url + "/"+endpoint+"/"+deviceId,
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
@@ -433,7 +490,13 @@ class Session {
                 method: 'post',
                 redirect: 'follow',
                 referrer: 'no-referrer',
-                body: ''
+                body: JSON.stringify({
+                    endpoint: "/"+endpoint+"/"+deviceId,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -454,7 +517,7 @@ class Session {
             return false;
         }
         const response = await this._fetchWithTimeout(
-            this.url + "/blinds/"+action,
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
@@ -464,7 +527,13 @@ class Session {
                 method: 'post',
                 redirect: 'follow',
                 referrer: 'no-referrer',
-                body: ''
+                body: JSON.stringify({
+                    endpoint: "/blinds/"+action,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -486,16 +555,23 @@ class Session {
         }
         
         const response = await this._fetchWithTimeout(
-            this.url + "/vents",
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer '+this.session_id,
                 },
-                method: 'get',
+                method: 'put',
                 redirect: 'follow',
-                referrer: 'no-referrer'
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/vents",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -522,7 +598,7 @@ class Session {
         }
         
         const response = await this._fetchWithTimeout(
-            this.url + "/vents/"+deviceId+"/"+position,
+            this.url,
             {
                 cache: 'no-store',
                 headers: {
@@ -532,7 +608,13 @@ class Session {
                 method: 'post',
                 redirect: 'follow',
                 referrer: 'no-referrer',
-                body: ''
+                body: JSON.stringify({
+                    endpoint: "/vents/"+deviceId+"/"+position,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
             }
         );
         
@@ -557,7 +639,7 @@ class Session {
         const signal = controller.signal;
         setTimeout(() => {
             controller.abort()
-        }, 4000);
+        }, 16000);
         
         const newOptions = { ...options, signal };
         
@@ -565,7 +647,7 @@ class Session {
             if( typeof window == "undefined" ){
                 return false;
             }
-            //console.log('Fetch failed: ', err);
+            console.log('Fetch failed: ', err);
             const errorOb = {
                 code: 'offline',
                 success: false,
@@ -579,15 +661,15 @@ class Session {
                 }
             }
             
-            if( !noWifi ){
-                // Device has internet, but server is offline
-                
-                //try backup server
-                if( url.includes( this.primary_url ) ){
-                    const backupUrl = url.replace( this.primary_url, this.backup_url );
-                    return await this._fetchWithTimeout( backupUrl, options );
-                }
-            }
+            // if( !noWifi ){
+            //     // Device has internet, but server is offline
+            //
+            //     //try backup server
+            //     if( url.includes( this.primary_url ) ){
+            //         const backupUrl = url.replace( this.primary_url, this.backup_url );
+            //         return await this._fetchWithTimeout( backupUrl, options );
+            //     }
+            // }
             
             return errorOb;
         });

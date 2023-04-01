@@ -36,14 +36,14 @@ function SimpleHeader() {
                                     listClassName="breadcrumb-links"
                                 >
                                     <BreadcrumbItem>
-                                        <Link href="/">
+                                        <Link href="/"><a>
                                             <FontAwesomeIcon className="menuIcon" icon={faHome} />
-                                        </Link>
+                                        </a></Link>
                                     </BreadcrumbItem>
                                     <BreadcrumbItem>
-                                        <Link href="/">
+                                        <Link href="/"><a>
                                             Dashboard
-                                        </Link>
+                                        </a></Link>
                                     </BreadcrumbItem>
                                 </Breadcrumb>
                             </Col>

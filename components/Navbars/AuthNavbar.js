@@ -55,18 +55,13 @@ function AdminNavbar({ theme, sidenavOpen, toggleSidenav }) {
                     <div className="align-items-center ml-md-auto ml-md-0" navbar>
                         <Media className="align-items-center">
                             <span className="avatar avatar-sm rounded-circle">
-                                        <Link href="/auth/login">
-                                                <img
-                                                alt="..."
-                                                src={require("assets/img/theme/profile.png")}
-                                                />
-                                        </Link>
+                                        
                                 </span>
                                 <Media className="ml-2 d-none d-lg-block">
                                     <span className="mb-0 text-sm font-weight-bold">
-                                            <Link href="/auth/login">
+                                            <Link href="/auth/login"><a>
                                                 Log In
-                                            </Link>
+                                            </a></Link>
                                     </span>
                                 </Media>
                         </Media>

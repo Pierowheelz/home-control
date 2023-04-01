@@ -328,9 +328,7 @@ class Register extends Component {
 							<CardFooter>
 								<Row className="justify-content-center">
 									<Col lg="6" md="6">
-										<Link
-											href="/auth/login"
-										>Login</Link>
+										<Link href="/auth/login"><a>Login</a></Link>
 									</Col>
 								</Row>
 							</CardFooter>

@@ -269,7 +269,7 @@ class Login extends Component {
 									<Col lg="6" md="6">
 										<Link
 											href="/auth/register"
-										>Register</Link>
+										><a>Register</a></Link>
 									</Col>
 								</Row>
 							</CardFooter>

@@ -136,8 +136,7 @@ function Sidebar({
             }
             return (
                 <NavItem className={activeRoute(prop.layout + prop.path)} key={key}>
-                    <Link href={prop.layout + prop.path}>
-                        <NavLink href="#link" onClick={closeSidenav}>
+                    <Link href={prop.layout + prop.path}><NavLink href="#link" onClick={closeSidenav}>
                             {prop.icon !== undefined ? (
                                 <>
                                     <FontAwesomeIcon className="menuIcon" icon={prop.icon} />
@@ -151,8 +150,7 @@ function Sidebar({
                             ) : (
                                 prop.name
                             )}
-                        </NavLink>
-                    </Link>
+                        </NavLink></Link>
                 </NavItem>
             );
         });
