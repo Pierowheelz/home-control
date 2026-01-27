@@ -36,7 +36,7 @@ class GarageDoor extends Component {
     // Timer to trigger each fetch of door state
     intervalTimer = null;
     defaultInterval = 10000; //every 30 seconds
-    triggerInterval = 1000; //every 5 seconds
+    triggerInterval = 2000; //every 5 seconds
     
     tick() {
         this.fetchDoorState();
@@ -171,8 +171,12 @@ class GarageDoor extends Component {
                             className={"mb-sm-3 mb-md-3 "}
                             color="primary"
                             type="button"
+                            disabled={triggered}
                             onClick={(e) => {
                                 e.preventDefault();
+                                if( triggered ){
+                                    return;
+                                }
                                 this.triggerDoor();
                             }}
                         >

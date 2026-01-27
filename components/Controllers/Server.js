@@ -40,7 +40,7 @@ class Server extends Component {
     };
     // Timer to trigger each fetch of power state
     intervalTimer = null;
-    defaultInterval = 30000; //every 30 seconds
+    defaultInterval = 20000; //every 20 seconds
     
     tick() {
         this.fetchServerState();

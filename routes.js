@@ -16,38 +16,18 @@ const getAppRoutes = ( userId ) => {
             name: "Dashboard",
             miniName: "Dsh",
             layout: "",
-        },
-        {
-            path: "/garage",
-            name: "Garage",
-            miniName: "Grg",
-            layout: "",
-        },
-        {
-            path: "/vents",
-            name: "Vents",
-            miniName: "Vnt",
-            layout: "",
-        },
+        }
     ];
     
     if( 0 == userId ){
         dashboardViews.push(
             {
-                path: "/seakers",
-                name: "Speakers",
-                miniName: "Spk",
+                path: "/bedroom1",
+                name: "Bedroom",
+                miniName: "Br",
                 layout: "",
             }
         );
-        // dashboardViews.push(
-        //     {
-        //         path: "/blinds",
-        //         name: "Blinds",
-        //         miniName: "B",
-        //         layout: "",
-        //     }
-        // );
         dashboardViews.push(
             {
                 path: "/server",
@@ -56,7 +36,34 @@ const getAppRoutes = ( userId ) => {
                 layout: "",
             }
         );
+    } else if ( 1 == userId ){
+        dashboardViews.push(
+            {
+                path: "/bedroom0",
+                name: "Bedroom",
+                miniName: "Br",
+                layout: "",
+            }
+        );
     }
+    
+    dashboardViews.push(
+        {
+            path: "/vents",
+            name: "Vents",
+            miniName: "Vnt",
+            layout: "",
+        }
+    );
+    
+    dashboardViews.push(
+        {
+            path: "/garage",
+            name: "Garage",
+            miniName: "Grg",
+            layout: "",
+        }
+    );
     
     return [
         {

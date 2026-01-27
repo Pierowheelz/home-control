@@ -1,45 +1,45 @@
 // Bootstrap functions
-@import '~bootstrap/scss/functions';
-@import "~bootstrap/scss/mixins";
+@import 'bootstrap/scss/functions';
+@import "bootstrap/scss/mixins";
 
 // Argon functions
 @import "custom/functions";
 @import "custom/variables";
-@import "~bootstrap/scss/variables";
+@import "bootstrap/scss/variables";
 
 // Argon mixins
 @import "custom/mixins";
 
 // Bootstrap components
-@import "~bootstrap/scss/root";
-@import "~bootstrap/scss/reboot";
-@import "~bootstrap/scss/type";
-@import "~bootstrap/scss/images";
-@import "~bootstrap/scss/code";
-@import "~bootstrap/scss/grid";
-@import "~bootstrap/scss/tables";
-@import "~bootstrap/scss/forms";
-@import "~bootstrap/scss/buttons";
-@import "~bootstrap/scss/transitions";
-@import "~bootstrap/scss/dropdown";
-@import "~bootstrap/scss/button-group";
-@import "~bootstrap/scss/input-group";
-@import "~bootstrap/scss/custom-forms";
-@import "~bootstrap/scss/nav";
-@import "~bootstrap/scss/navbar";
-@import "~bootstrap/scss/card";
-@import "~bootstrap/scss/breadcrumb";
-@import "~bootstrap/scss/pagination";
-@import "~bootstrap/scss/badge";
-@import "~bootstrap/scss/jumbotron";
-@import "~bootstrap/scss/alert";
-@import "~bootstrap/scss/progress";
-@import "~bootstrap/scss/media";
-@import "~bootstrap/scss/list-group";
-@import "~bootstrap/scss/close";
-@import "~bootstrap/scss/modal";
-@import "~bootstrap/scss/tooltip";
-@import "~bootstrap/scss/utilities";
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/code";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/dropdown";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/input-group";
+@import "bootstrap/scss/custom-forms";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/navbar";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/breadcrumb";
+@import "bootstrap/scss/pagination";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/jumbotron";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/progress";
+@import "bootstrap/scss/media";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/modal";
+@import "bootstrap/scss/tooltip";
+@import "bootstrap/scss/utilities";
 
 // Argon components
 @import 'custom/components';
@@ -49,6 +49,14 @@
 @import 'react/react-differences';
 
 /* Start Custom CSS (Peter) */
+
+body{
+    background-color:#262626;
+}
+
+.card .text-white{
+    color:#fff !important;
+}
 
 .text-align-left{
     text-align: left;
@@ -144,6 +152,8 @@
     .ventInput{
         border:none;
         text-align:right;
+        background-color:transparent;
+        color: white;
     }
 }
 

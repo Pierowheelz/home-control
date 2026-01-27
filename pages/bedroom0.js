@@ -13,7 +13,7 @@ import {
 import Admin from "layouts/Admin.js";
 // core components
 import SimpleHeader from "components/Headers/SimpleHeader.js";
-import Lights from "components/Controllers/Lights.js";
+// import Lights from "components/Controllers/Lights.js";
 import Vent from "components/Controllers/Vent.js";
 
 class Page extends Component {
@@ -23,9 +23,9 @@ class Page extends Component {
                 <SimpleHeader />
                 <Container className="mt--6" fluid>
                     <Row>
-                        <Col md="6" lg="6" xl="4">
+                        {/*<Col md="6" lg="6" xl="4">
                             <Lights deviceId="10004bae5e" />
-                        </Col>
+                        </Col>*/}
                         <Col md="6" lg="6" xl="4">
                             <Vent deviceId="1" title="AC Vent" />
                         </Col>
