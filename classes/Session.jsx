@@ -588,6 +588,70 @@ class Session {
         
         return ret;
     };
+
+    /**
+     * Fetches the vent automation dashboard (`GET /vents/actions`): per-room temps,
+     * humidity, `wantOpen`, manual override flags, etc. Refreshes vent hardware once
+     * server-side. Builds a synthetic motor `status` map from `rooms` and
+     * dispatches `ventsupdate` so Vent tiles stay in sync with positions.
+     *
+     * @returns {Promise<object|false>}
+     */
+    getVentsDashboard = async () => {
+        if( typeof window == "undefined" ){
+            return false;
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this.session_id,
+                },
+                method: 'put',
+                redirect: 'follow',
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/vents/actions",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
+            }
+        );
+
+        let ret = response;
+        if( typeof ret.json == "function" ){
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        const success = ret.success ?? false;
+        if( success && Array.isArray( ret.rooms ) ){
+            /** @type {Record<string, { name: string, pos: number }>} */
+            const status = {};
+            for( const row of ret.rooms ){
+                const mid = row.motorId;
+                if( mid === undefined || mid === null ){
+                    continue;
+                }
+                const key = String( mid );
+                const posVal = row.pos;
+                const pos = typeof posVal === 'number' && Number.isFinite( posVal ) ? posVal : 0;
+                const name = row.displayName ?? row.room ?? '';
+                status[key] = { name, pos };
+            }
+            if( Object.keys( status ).length > 0 ){
+                const updateEvent = new CustomEvent( 'ventsupdate', {detail: status} );
+                document.dispatchEvent(updateEvent);
+            }
+        }
+
+        return ret;
+    };
     
     /**
      * Move vent to position

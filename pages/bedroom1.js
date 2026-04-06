@@ -17,6 +17,7 @@ import SimpleHeader from "components/Headers/SimpleHeader.js";
 // import Lights from "components/Controllers/Lights.js";
 import Speakers from "components/Controllers/Speakers.js";
 import Vent from "components/Controllers/Vent.js";
+import VentStateController from "components/Controllers/middleware/VentStateController.js";
 
 class Page extends Component {
     render(){
@@ -24,6 +25,7 @@ class Page extends Component {
             <>
                 <SimpleHeader />
                 <Container className="mt--6" fluid>
+                    <VentStateController>
                     <Row>
                         {/*<Col md="6" lg="6" xl="4">
                             <Lights deviceId="10004baf3d" />
@@ -38,6 +40,7 @@ class Page extends Component {
                             <Speakers />
                         </Col>
                     </Row>
+                    </VentStateController>
                 </Container>
             </>
         );

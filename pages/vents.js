@@ -13,10 +13,9 @@ import {
 import Admin from "layouts/Admin.js";
 // core components
 import SimpleHeader from "components/Headers/SimpleHeader.js";
-import Blinds from "components/Controllers/Blinds.js";
-import Lights from "components/Controllers/Lights.js";
-import Speakers from "components/Controllers/Speakers.js";
 import Vent from "components/Controllers/Vent.js";
+import VentControllerCard from "components/Controllers/VentControllerCard.js";
+import VentStateController from "components/Controllers/middleware/VentStateController.js";
 
 class Page extends Component {
     render(){
@@ -24,17 +23,24 @@ class Page extends Component {
             <>
                 <SimpleHeader />
                 <Container className="mt--6" fluid>
+                    <VentStateController>
                     <Row>
                         <Col sm="12" md="4" lg="4" xl="4">
                             <Vent deviceId="0" title="Peter's Room" />
                         </Col>
                         <Col sm="12" md="4" lg="4" xl="4">
-                            <Vent deviceId="1" title="Burton's Room" doesRefresh={ false } />
+                            <Vent deviceId="1" title="Burton's Room" />
                         </Col>
                         <Col sm="12" md="4" lg="4" xl="4">
-                            <Vent deviceId="2" title="Guest Room" doesRefresh={ false } />
+                            <Vent deviceId="2" title="Guest Room" />
                         </Col>
                     </Row>
+                    <Row className="mt-4">
+                        <Col sm="12">
+                            <VentControllerCard />
+                        </Col>
+                    </Row>
+                    </VentStateController>
                 </Container>
             </>
         );

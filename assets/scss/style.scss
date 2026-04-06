@@ -135,6 +135,82 @@ body{
 }
 
 /* Vents */
+.vent-room-card,
+.vent-controller-room-card{
+    .card-body{
+        min-height: 0;
+    }
+}
+
+.vent-controller-card-metrics{
+    .vent-controller-mode{
+        font-size: 0.95rem;
+        font-weight: 500;
+        line-height: 1.2;
+    }
+    .vent-controller-target-value{
+        font-size: 1.35rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    .vent-controller-target-missing{
+        opacity: 0.45;
+    }
+    .vent-controller-target-unit{
+        font-size: 0.7rem;
+        font-weight: 500;
+        opacity: 0.75;
+        margin-top: 0.15rem;
+    }
+}
+
+.vent-card-metrics{
+    .vent-temp-value{
+        font-size: 2.85rem;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -0.03em;
+    }
+    .vent-temp-missing{
+        opacity: 0.45;
+    }
+    .vent-temp-unit{
+        font-size: 1.35rem;
+        font-weight: 500;
+        opacity: 0.75;
+        margin-left: 0.2rem;
+        line-height: 1;
+        align-self: flex-end;
+        padding-bottom: 0.35rem;
+    }
+    .vent-target-label{
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+    }
+    .vent-target-value{
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    .vent-humidity-value{
+        font-size: 1.35rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    .vent-humidity-missing{
+        opacity: 0.45;
+    }
+    .vent-humidity-unit{
+        font-size: 0.65rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-top: 0.15rem;
+    }
+}
+
+.vent-card-stamp{
+    opacity: 0.85;
+}
+
 .ventState{
     position:relative;
     
@@ -154,6 +230,10 @@ body{
         text-align:right;
         background-color:transparent;
         color: white;
+    }
+
+    p {
+        margin-bottom: 0;
     }
 }
 
