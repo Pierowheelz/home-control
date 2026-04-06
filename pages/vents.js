@@ -15,6 +15,7 @@ import Admin from "layouts/Admin.js";
 import SimpleHeader from "components/Headers/SimpleHeader.js";
 import Vent from "components/Controllers/Vent.js";
 import VentControllerCard from "components/Controllers/VentControllerCard.js";
+import VentSensorOnlyRooms from "components/Controllers/VentSensorOnlyRooms.js";
 import VentStateController from "components/Controllers/middleware/VentStateController.js";
 
 class Page extends Component {
@@ -40,6 +41,7 @@ class Page extends Component {
                             <VentControllerCard />
                         </Col>
                     </Row>
+                    <VentSensorOnlyRooms />
                     </VentStateController>
                 </Container>
             </>

@@ -14,6 +14,14 @@ import { createContext } from "react";
  * @property {boolean|null} [wantOpen]
  * @property {boolean} [manualOverrideActive]
  * @property {number|null} [manualOverrideUntilMs]
+ * @property {number|null} [roomTargetOverrideC]
+ * @property {number|null} [roomTargetOverrideUntilMs]
+ * @property {number|null} [sensorPrimaryTemperatureC]
+ * @property {number|null} [sensorAltTemperatureC]
+ * @property {number|null} [sensorPrimaryHumidity]
+ * @property {number|null} [sensorAltHumidity]
+ * @property {number|null} [sensorPrimaryLastUpdateMs]
+ * @property {number|null} [sensorAltLastUpdateMs]
  */
 
 /**
@@ -51,6 +59,8 @@ import { createContext } from "react";
  * @property {{ coolTargetC?: number, heatTargetC?: number, roomHysteresisC?: number }|null} targets
  * @property {VentActionLogEntry[]} actions Newest first.
  * @property {VentDashboardStatistics|null} statistics
+ * @property {VentRoomDashboardRow[]} sensorOnlyRooms Rooms with climate data but no `motorId` (read-only tiles).
+ * @property {() => Promise<void>} [refreshDashboard] Re-runs `GET /vents/actions` (latest response wins if polls overlap).
  */
 
 /** @type {import("react").Context<VentFetchState | null>} */

@@ -695,6 +695,97 @@ class Session {
         
         return ret;
     };
+
+    /**
+     * Sets a temporary per-room vent comfort target (°C) for a room key in the server's vent map.
+     *
+     * @param {string} room Room key (e.g. as returned in `GET /vents/actions` `rooms[].room`).
+     * @param {number} targetC Target temperature in °C.
+     * @returns {Promise<object|false>}
+     */
+    setVentRoomTarget = async (room, targetC) => {
+        if (typeof window === "undefined") {
+            return false;
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: "no-store",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + this.session_id,
+                },
+                method: "post",
+                redirect: "follow",
+                referrer: "no-referrer",
+                body: JSON.stringify({
+                    endpoint: "/vents/room-target",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + this.session_id,
+                    },
+                    body: {
+                        room,
+                        targetC,
+                    },
+                }),
+            }
+        );
+
+        let ret = response;
+        if (typeof ret.json == "function") {
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        return ret;
+    };
+
+    /**
+     * Clears the active temporary comfort target override for a vent-mapped room.
+     *
+     * @param {string} room Room key (same as {@link Session#setVentRoomTarget}).
+     * @returns {Promise<object|false>}
+     */
+    cancelVentRoomTarget = async (room) => {
+        if (typeof window === "undefined") {
+            return false;
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: "no-store",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + this.session_id,
+                },
+                method: "post",
+                redirect: "follow",
+                referrer: "no-referrer",
+                body: JSON.stringify({
+                    endpoint: "/vents/room-target",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + this.session_id,
+                    },
+                    body: {
+                        room,
+                        cancel: true,
+                    },
+                }),
+            }
+        );
+
+        let ret = response;
+        if (typeof ret.json == "function") {
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        return ret;
+    };
     
     /**
      * Gets Server Controller state.

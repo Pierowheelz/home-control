@@ -136,10 +136,15 @@ body{
 
 /* Vents */
 .vent-room-card,
-.vent-controller-room-card{
+.vent-controller-room-card,
+.vent-sensor-only-card{
     .card-body{
         min-height: 0;
     }
+}
+
+.vent-room-card .card-header h2{
+    font-size: $h3-font-size;
 }
 
 .vent-controller-card-metrics{
@@ -191,6 +196,17 @@ body{
         font-size: 0.95rem;
         font-weight: 500;
     }
+    .vent-clickable-metric{
+        cursor: pointer;
+        border-radius: 0.2rem;
+        &:hover{
+            opacity: 0.88;
+        }
+        &:focus{
+            outline: 0;
+            box-shadow: 0 0 0 0.15rem rgba(94, 114, 228, 0.35);
+        }
+    }
     .vent-humidity-value{
         font-size: 1.35rem;
         font-weight: 600;
@@ -209,6 +225,10 @@ body{
 
 .vent-card-stamp{
     opacity: 0.85;
+}
+
+.vent-room-target-modal-slider{
+    padding: 0.5rem 0 1rem;
 }
 
 .ventState{

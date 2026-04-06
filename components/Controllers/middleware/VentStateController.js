@@ -31,13 +31,19 @@ export default class VentStateController extends Component {
         targets: null,
         actions: [],
         statistics: null,
+        sensorOnlyRooms: [],
     };
 
     /** @type {ReturnType<typeof setInterval> | null} */
     intervalTimer = null;
 
-    /** When true, a {@link WbSession#getVentsDashboard} call is still running. */
-    requestInFlight = false;
+    /**
+     * Incremented at the start of each dashboard fetch; responses with a stale
+     * generation are ignored so overlapping polls do not corrupt state.
+     *
+     * @type {number}
+     */
+    fetchGeneration = 0;
 
     componentDidMount() {
         this.fetchVentState();
@@ -55,24 +61,24 @@ export default class VentStateController extends Component {
     }
 
     /**
-     * Polls vent dashboard once. If a poll is already running, returns immediately.
+     * Polls vent dashboard once. Overlapping calls are allowed; each response
+     * carries a generation stamp so only the latest applied result updates state.
      * Successful responses dispatch `ventsupdate` from {@link WbSession#getVentsDashboard}.
      *
      * @returns {Promise<void>}
      */
     fetchVentState = async () => {
-        if (this.requestInFlight) {
-            return;
-        }
-
-        this.requestInFlight = true;
+        const gen = ++this.fetchGeneration;
         this.setState({ loading: true, error: false, errorMsg: "" });
 
         const response = await this.context.getVentsDashboard();
         console.log("Vents dashboard response: ", response);
 
+        if (gen !== this.fetchGeneration) {
+            return;
+        }
+
         if (response === false) {
-            this.requestInFlight = false;
             this.setState({
                 loading: false,
                 error: false,
@@ -83,6 +89,7 @@ export default class VentStateController extends Component {
                 targets: null,
                 actions: [],
                 statistics: null,
+                sensorOnlyRooms: [],
             });
             return;
         }
@@ -100,6 +107,7 @@ export default class VentStateController extends Component {
             targets: this.state.targets,
             actions: this.state.actions,
             statistics: this.state.statistics,
+            sensorOnlyRooms: this.state.sensorOnlyRooms,
         };
         if (!success || error) {
             console.warn("Failed to fetch vent dashboard.", response);
@@ -139,24 +147,35 @@ export default class VentStateController extends Component {
             if (Array.isArray(response.rooms)) {
                 /** @type {Record<string, object>} */
                 const roomsByMotorId = {};
+                /** @type {object[]} */
+                const sensorOnlyRooms = [];
                 for (const row of response.rooms) {
                     const mid = row.motorId;
                     if (mid === undefined || mid === null) {
+                        sensorOnlyRooms.push(row);
                         continue;
                     }
                     roomsByMotorId[String(mid)] = row;
                 }
                 newState.roomsByMotorId = roomsByMotorId;
+                newState.sensorOnlyRooms = sensorOnlyRooms;
             }
         }
 
+        if (gen !== this.fetchGeneration) {
+            return;
+        }
+
         this.setState(newState);
-        this.requestInFlight = false;
     };
 
     render() {
+        const value = {
+            ...this.state,
+            refreshDashboard: this.fetchVentState,
+        };
         return (
-            <VentStateContext.Provider value={this.state}>
+            <VentStateContext.Provider value={value}>
                 {this.props.children}
             </VentStateContext.Provider>
         );
