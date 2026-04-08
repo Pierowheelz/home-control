@@ -22,6 +22,8 @@ import { createContext } from "react";
  * @property {number|null} [sensorAltHumidity]
  * @property {number|null} [sensorPrimaryLastUpdateMs]
  * @property {number|null} [sensorAltLastUpdateMs]
+ * @property {number|null} [battery] Battery level 0–100 from `/vents/actions` room rows.
+ * @property {number|null} [signal] Link quality on an approximately 0–150 scale from `/vents/actions` room rows.
  */
 
 /**

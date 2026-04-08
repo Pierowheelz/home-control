@@ -7,6 +7,7 @@ import PropTypes from "prop-types";
 import { Card, CardHeader, CardBody } from "reactstrap";
 
 import { formatRelativeTimeAgo } from "components/Controllers/middleware/ventRelativeTime.js";
+import VentRoomBatterySignalPills from "components/Controllers/VentRoomBatterySignalPills.js";
 
 /**
  * @param {import("components/Controllers/middleware/VentStateContext.js").VentRoomDashboardRow|null|undefined} roomRow
@@ -59,6 +60,7 @@ function VentSensorRoomCardInner({ roomRow }) {
 
     return (
         <Card className="border-0 vent-room-card vent-sensor-only-card h-100 d-flex flex-column">
+            <VentRoomBatterySignalPills roomRow={roomRow} />
             <CardHeader>
                 <h2 className="mb-0">{title}</h2>
                 {src ? (

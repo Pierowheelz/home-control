@@ -10,6 +10,9 @@ import {
     Card,
     CardHeader,
     CardBody,
+    FormGroup,
+    Input,
+    Label,
     Modal,
     ModalHeader,
     ModalBody,
@@ -31,6 +34,7 @@ import {
     formatRelativeTimeAgo,
     formatTimeRemainingUntil,
 } from "components/Controllers/middleware/ventRelativeTime.js";
+import VentRoomBatterySignalPills from "components/Controllers/VentRoomBatterySignalPills.js";
 
 /** Minimum room comfort target in the picker (°C). */
 const ROOM_TARGET_MIN_C = 18;
@@ -38,6 +42,28 @@ const ROOM_TARGET_MIN_C = 18;
 const ROOM_TARGET_MAX_C = 25;
 /** Slider step for room comfort target (°C). */
 const ROOM_TARGET_STEP_C = 0.1;
+
+/** Default comfort override duration when opening the room target modal (20 hours, ms). */
+const ROOM_TARGET_DEFAULT_DURATION_MS = 20 * 60 * 60 * 1000;
+
+/**
+ * Preset durations for the room target modal (label + duration in ms).
+ *
+ * @type {readonly { label: string, ms: number }[]}
+ */
+const ROOM_TARGET_DURATION_OPTIONS = [
+    { label: "5 minutes", ms: 5 * 60 * 1000 },
+    { label: "15 minutes", ms: 15 * 60 * 1000 },
+    { label: "1 hr", ms: 60 * 60 * 1000 },
+    { label: "4hrs", ms: 4 * 60 * 60 * 1000 },
+    { label: "6hrs", ms: 6 * 60 * 60 * 1000 },
+    { label: "8hrs", ms: 8 * 60 * 60 * 1000 },
+    { label: "12hrs", ms: 12 * 60 * 60 * 1000 },
+    { label: "20hrs", ms: ROOM_TARGET_DEFAULT_DURATION_MS },
+    { label: "1 week", ms: 7 * 24 * 60 * 60 * 1000 },
+    { label: "4 weeks", ms: 28 * 24 * 60 * 60 * 1000 },
+    { label: "3 months", ms: 90 * 24 * 60 * 60 * 1000 },
+];
 
 /**
  * @param {number} c
@@ -180,6 +206,8 @@ class Vent extends Component {
         roomTargetDraftC: clampRoomTargetC(21),
         /** True if {@link roomTargetRoomKey} had an override when the modal opened (controls Reset / Update labels). */
         roomTargetHadOverrideAtOpen: false,
+        /** Selected override duration (ms); defaults to 20h when the modal opens. */
+        roomTargetDurationMs: ROOM_TARGET_DEFAULT_DURATION_MS,
         roomTargetBusy: false,
         roomTargetErrorMsg: "",
     };
@@ -269,6 +297,7 @@ class Vent extends Component {
             roomTargetRoomKey: roomKey,
             roomTargetDraftC: initialRoomTargetDraftC(roomRow),
             roomTargetHadOverrideAtOpen: hasActiveRoomTargetOverride(roomRow),
+            roomTargetDurationMs: ROOM_TARGET_DEFAULT_DURATION_MS,
             roomTargetErrorMsg: "",
             roomTargetBusy: false,
         });
@@ -291,14 +320,16 @@ class Vent extends Component {
      * @returns {Promise<boolean>} True when the server accepted the setpoint.
      */
     applyRoomTarget = async () => {
-        const { roomTargetRoomKey, roomTargetDraftC } = this.state;
+        const { roomTargetRoomKey, roomTargetDraftC, roomTargetDurationMs } =
+            this.state;
         if (!roomTargetRoomKey) {
             return false;
         }
         this.setState({ roomTargetBusy: true, roomTargetErrorMsg: "" });
         const res = await this.context.setVentRoomTarget(
             roomTargetRoomKey,
-            roomTargetDraftC
+            roomTargetDraftC,
+            roomTargetDurationMs
         );
         if (res === false) {
             this.setState({
@@ -417,6 +448,7 @@ class Vent extends Component {
         const {
             roomTargetModalOpen,
             roomTargetDraftC,
+            roomTargetDurationMs,
             roomTargetBusy,
             roomTargetErrorMsg,
             roomTargetHadOverrideAtOpen,
@@ -459,10 +491,35 @@ class Vent extends Component {
                                 }}
                             />
                         </div>
+                        <FormGroup className="mb-0 mt-3">
+                            <Label for="vent-room-target-duration" className="small text-muted">
+                                Duration
+                            </Label>
+                            <Input
+                                type="select"
+                                name="vent-room-target-duration"
+                                id="vent-room-target-duration"
+                                bsSize="sm"
+                                disabled={roomTargetBusy}
+                                value={String(roomTargetDurationMs)}
+                                onChange={(e) => {
+                                    const ms = Number(e.target.value);
+                                    if (Number.isFinite(ms)) {
+                                        this.setState({ roomTargetDurationMs: ms });
+                                    }
+                                }}
+                            >
+                                {ROOM_TARGET_DURATION_OPTIONS.map((opt) => (
+                                    <option key={opt.ms} value={String(opt.ms)}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </Input>
+                        </FormGroup>
                     </ModalBody>
                     <ModalFooter className="d-flex flex-wrap justify-content-between">
                         <Button
-                            color="secondary"
+                            color="light"
                             outline
                             disabled={roomTargetBusy}
                             onClick={this.closeRoomTargetModal}
@@ -514,6 +571,7 @@ class Vent extends Component {
                         </div>
                     </ModalFooter>
                 </Modal>
+                <VentRoomBatterySignalPills roomRow={roomRow} />
                 <CardHeader>
                     <h2 className="mb-0">{title}</h2>
                 </CardHeader>

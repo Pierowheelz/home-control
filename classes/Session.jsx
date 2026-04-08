@@ -701,11 +701,22 @@ class Session {
      *
      * @param {string} room Room key (e.g. as returned in `GET /vents/actions` `rooms[].room`).
      * @param {number} targetC Target temperature in °C.
+     * @param {number} [durationMs] Optional override duration in milliseconds.
      * @returns {Promise<object|false>}
      */
-    setVentRoomTarget = async (room, targetC) => {
+    setVentRoomTarget = async (room, targetC, durationMs) => {
         if (typeof window === "undefined") {
             return false;
+        }
+
+        /** @type {{ room: string, targetC: number, duration?: number }} */
+        const innerBody = { room, targetC };
+        if (
+            typeof durationMs === "number" &&
+            Number.isFinite(durationMs) &&
+            durationMs > 0
+        ) {
+            innerBody.duration = Math.round(durationMs);
         }
 
         const response = await this._fetchWithTimeout(
@@ -725,10 +736,7 @@ class Session {
                         "Content-Type": "application/json",
                         Authorization: "Bearer " + this.session_id,
                     },
-                    body: {
-                        room,
-                        targetC,
-                    },
+                    body: innerBody,
                 }),
             }
         );
