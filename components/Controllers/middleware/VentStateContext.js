@@ -48,6 +48,18 @@ import { createContext } from "react";
  */
 
 /**
+ * Live HVAC power-draw snapshot from `/vents/actions`.
+ *
+ * @typedef {Object} VentHvacPower
+ * @property {number|null} thresholdW Watts above which the HVAC is considered active.
+ * @property {number|null} powerW Most recent instantaneous HVAC power reading in watts.
+ * @property {number|null} lastUpdateMs Epoch ms of the most recent power sample.
+ * @property {boolean} fresh True if the last sample is recent enough to trust.
+ * @property {boolean} active True if `powerW` is above `thresholdW`.
+ * @property {string|null} lastActiveTempBasedHvacMode Last HVAC mode observed while `active` (e.g. "heating"/"cooling").
+ */
+
+/**
  * React context value pushed by VentStateController with shared vent poll
  * status for all Vent instances on the page.
  *
@@ -62,6 +74,7 @@ import { createContext } from "react";
  * @property {VentActionLogEntry[]} actions Newest first.
  * @property {VentDashboardStatistics|null} statistics
  * @property {VentRoomDashboardRow[]} sensorOnlyRooms Rooms with climate data but no `motorId` (read-only tiles).
+ * @property {VentHvacPower|null} hvacPower Instantaneous HVAC power reading from `/vents/actions`.
  * @property {() => Promise<void>} [refreshDashboard] Re-runs `GET /vents/actions` (latest response wins if polls overlap).
  */
 

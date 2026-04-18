@@ -192,6 +192,23 @@ body{
         opacity: 0.75;
         margin-top: 0.15rem;
     }
+    .vent-controller-power-value{
+        font-size: 1.1rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+    .vent-controller-power-missing{
+        opacity: 0.45;
+    }
+    .vent-controller-power-stale{
+        opacity: 0.55;
+    }
+    .vent-controller-power-unit{
+        font-size: 0.65rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-top: 0.15rem;
+    }
 }
 
 .vent-card-metrics{

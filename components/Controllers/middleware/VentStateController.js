@@ -8,6 +8,39 @@ import PropTypes from "prop-types";
 import WbSession from "classes/Session.jsx";
 import { VentStateContext } from "./VentStateContext.js";
 
+/**
+ * Coerce a raw `/vents/actions` `hvacPower` payload into a normalised struct
+ * or `null` when the field is missing/invalid.
+ *
+ * @param {unknown} raw
+ * @returns {import("./VentStateContext.js").VentHvacPower|null}
+ */
+function parseHvacPower(raw) {
+    if (raw == null || typeof raw !== "object" || Array.isArray(raw)) {
+        return null;
+    }
+    /** @type {Record<string, unknown>} */
+    const obj = raw;
+    /**
+     * @param {unknown} v
+     * @returns {number|null}
+     */
+    const num = (v) =>
+        typeof v === "number" && Number.isFinite(v) ? v : null;
+    return {
+        thresholdW: num(obj.thresholdW),
+        powerW: num(obj.powerW),
+        lastUpdateMs: num(obj.lastUpdateMs),
+        fresh: obj.fresh === true,
+        active: obj.active === true,
+        lastActiveTempBasedHvacMode:
+            typeof obj.lastActiveTempBasedHvacMode === "string" &&
+            obj.lastActiveTempBasedHvacMode !== ""
+                ? obj.lastActiveTempBasedHvacMode
+                : null,
+    };
+}
+
 export default class VentStateController extends Component {
     static contextType = WbSession;
 
@@ -32,6 +65,7 @@ export default class VentStateController extends Component {
         actions: [],
         statistics: null,
         sensorOnlyRooms: [],
+        hvacPower: null,
     };
 
     /** @type {ReturnType<typeof setInterval> | null} */
@@ -90,6 +124,7 @@ export default class VentStateController extends Component {
                 actions: [],
                 statistics: null,
                 sensorOnlyRooms: [],
+                hvacPower: null,
             });
             return;
         }
@@ -108,6 +143,7 @@ export default class VentStateController extends Component {
             actions: this.state.actions,
             statistics: this.state.statistics,
             sensorOnlyRooms: this.state.sensorOnlyRooms,
+            hvacPower: this.state.hvacPower,
         };
         if (!success || error) {
             console.warn("Failed to fetch vent dashboard.", response);
@@ -143,6 +179,7 @@ export default class VentStateController extends Component {
                 !Array.isArray(response.statistics)
                     ? { ...response.statistics }
                     : null;
+            newState.hvacPower = parseHvacPower(response.hvacPower);
 
             if (Array.isArray(response.rooms)) {
                 /** @type {Record<string, object>} */

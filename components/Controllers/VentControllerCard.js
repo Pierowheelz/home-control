@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 import { Card, CardHeader, CardBody } from "reactstrap";
 
 import { VentStateContext } from "components/Controllers/middleware/VentStateContext.js";
+import { formatRelativeTimeAgo } from "components/Controllers/middleware/ventRelativeTime.js";
 
 /**
  * Target setpoint display for the controller card (numeric + mode-dependent value).
@@ -71,6 +72,20 @@ function formatAutomation24hStat(statistics) {
         return `${n} (${failed} failed)`;
     }
     return `${n}`;
+}
+
+/**
+ * Render the HVAC instantaneous power reading as "88.3 W" (one decimal place).
+ * Returns `"—"` when the value is missing or not finite.
+ *
+ * @param {number|null|undefined} powerW
+ * @returns {string}
+ */
+function formatPowerW(powerW) {
+    if (typeof powerW !== "number" || !Number.isFinite(powerW)) {
+        return "—";
+    }
+    return `${powerW.toFixed(1)} W`;
 }
 
 /**
@@ -142,6 +157,17 @@ function VentControllerCardInner({ ventFetch }) {
     const actions = Array.isArray(ventFetch?.actions) ? ventFetch.actions : [];
     const roomsByMotorId = ventFetch?.roomsByMotorId ?? null;
 
+    const hvacPower = ventFetch?.hvacPower ?? null;
+    const hasPower =
+        hvacPower != null &&
+        typeof hvacPower.powerW === "number" &&
+        Number.isFinite(hvacPower.powerW);
+    const powerStr = hasPower ? formatPowerW(hvacPower.powerW) : "—";
+    const powerUpdatedStr = hvacPower != null
+        ? formatRelativeTimeAgo(hvacPower.lastUpdateMs)
+        : "—";
+    const powerIsStale = hvacPower != null && hvacPower.fresh === false;
+
     return (
         <Card className="border-0 vent-controller-room-card d-flex flex-column">
             <CardHeader>
@@ -189,6 +215,18 @@ function VentControllerCardInner({ ventFetch }) {
                                     </div>
                                 </>
                             )}
+                            <div
+                                className={
+                                    "vent-controller-power-value mt-2" +
+                                    (hasPower ? "" : " vent-controller-power-missing") +
+                                    (powerIsStale ? " vent-controller-power-stale" : "")
+                                }
+                            >
+                                {powerStr}
+                            </div>
+                            <div className="vent-controller-power-unit text-muted">
+                                HVAC POWER
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -246,7 +284,8 @@ function VentControllerCardInner({ ventFetch }) {
                     )}
                 </div>
                 <div className="vent-card-stamp vent-controller-automation-stamp text-muted small text-right mt-auto pt-3">
-                    Automations (last 24hrs): {automationLine}
+                    <div>Automations (last 24hrs): {automationLine}</div>
+                    <div>Updated {powerUpdatedStr}</div>
                 </div>
             </CardBody>
         </Card>
