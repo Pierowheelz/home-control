@@ -16,6 +16,8 @@ import { createContext } from "react";
  * @property {number|null} [manualOverrideUntilMs]
  * @property {number|null} [roomTargetOverrideC]
  * @property {number|null} [roomTargetOverrideUntilMs]
+ * @property {number} [effectiveCoolTargetC] Resolved cooling edge (global → `roomTargets` → temporary override).
+ * @property {number} [effectiveHeatTargetC] Resolved heating edge (same priority); vent-mapped rows only.
  * @property {number|null} [sensorPrimaryTemperatureC]
  * @property {number|null} [sensorAltTemperatureC]
  * @property {number|null} [sensorPrimaryHumidity]

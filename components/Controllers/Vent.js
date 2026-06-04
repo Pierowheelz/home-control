@@ -79,9 +79,8 @@ function clampRoomTargetC(c) {
  * @returns {number}
  */
 function initialRoomTargetDraftC(roomRow) {
-    const ov = roomRow?.roomTargetOverrideC;
-    if (typeof ov === "number" && Number.isFinite(ov)) {
-        return clampRoomTargetC(ov);
+    if (hasActiveRoomTargetOverride(roomRow)) {
+        return clampRoomTargetC(roomRow.roomTargetOverrideC);
     }
     const t = roomRow?.temperatureC;
     if (typeof t === "number" && Number.isFinite(t)) {
@@ -91,12 +90,23 @@ function initialRoomTargetDraftC(roomRow) {
 }
 
 /**
- * @param {{ room?: string|null, roomTargetOverrideC?: number|null }|null|undefined} roomRow
+ * True when `GET /vents/actions` reports an unexpired temporary override for the room.
+ *
+ * @param {{ roomTargetOverrideC?: number|null, roomTargetOverrideUntilMs?: number|null }|null|undefined} roomRow
  * @returns {boolean}
  */
 function hasActiveRoomTargetOverride(roomRow) {
     const ov = roomRow?.roomTargetOverrideC;
-    return typeof ov === "number" && Number.isFinite(ov);
+    const until = roomRow?.roomTargetOverrideUntilMs;
+    if (
+        typeof ov !== "number" ||
+        !Number.isFinite(ov) ||
+        typeof until !== "number" ||
+        !Number.isFinite(until)
+    ) {
+        return false;
+    }
+    return Date.now() < until;
 }
 
 /**
@@ -116,9 +126,8 @@ function resolveVentRoomKey(roomRow, titleProp) {
 }
 
 /**
- * Global HVAC target °C for the current mode on room tiles: cooling/heating
- * use the same setpoints as the controller card; `idle` has no global target
- * (shows a dash unless a per-room override is active).
+ * Global config targets from `GET /vents/actions` `targets` (not per-room bands).
+ * Used as the last fallback on room tiles; see {@link roomTargetTempDisplay}.
  *
  * @param {string} mode
  * @param {{ coolTargetC?: number, heatTargetC?: number }|null} targets
@@ -148,6 +157,39 @@ function controllerTargetParts(mode, targets) {
         default:
             return { main: "—", hasValue: false };
     }
+}
+
+/**
+ * Room tile target °C for the current dashboard `mode`.
+ * Matches vent automation band resolution (see Vent-Dashboard.md):
+ * temporary `roomTargetOverrideC` → `effectiveCoolTargetC` / `effectiveHeatTargetC`
+ * (includes `roomTargets` config) → global `targets` fallback.
+ *
+ * @param {{ roomTargetOverrideC?: number|null, roomTargetOverrideUntilMs?: number|null, effectiveCoolTargetC?: number, effectiveHeatTargetC?: number }|null} roomRow
+ * @param {string} mode `idle` | `cooling` | `heating` | …
+ * @param {string} globalTargetMain
+ * @param {boolean} hasGlobalTarget
+ * @returns {string}
+ */
+function roomTargetTempDisplay(roomRow, mode, globalTargetMain, hasGlobalTarget) {
+    if (hasActiveRoomTargetOverride(roomRow)) {
+        return `${roomRow.roomTargetOverrideC.toFixed(1)} °C`;
+    }
+    if (mode === "cooling") {
+        const cool = roomRow?.effectiveCoolTargetC;
+        if (typeof cool === "number" && Number.isFinite(cool)) {
+            return `${cool.toFixed(1)} °C`;
+        }
+    } else if (mode === "heating") {
+        const heat = roomRow?.effectiveHeatTargetC;
+        if (typeof heat === "number" && Number.isFinite(heat)) {
+            return `${heat.toFixed(1)} °C`;
+        }
+    }
+    if (hasGlobalTarget && (mode === "cooling" || mode === "heating")) {
+        return `${globalTargetMain} °C`;
+    }
+    return "—";
 }
 
 /**
@@ -435,11 +477,12 @@ class Vent extends Component {
         const targets = ventFetch?.targets ?? null;
         const { main: globalTargetMain, hasValue: hasGlobalTarget } =
             controllerTargetParts(mode, targets);
-        const targetTempDisplay = hasComfortOverride
-            ? `${roomRow.roomTargetOverrideC.toFixed(1)} °C`
-            : hasGlobalTarget
-              ? `${globalTargetMain} °C`
-              : "—";
+        const targetTempDisplay = roomTargetTempDisplay(
+            roomRow,
+            mode,
+            globalTargetMain,
+            hasGlobalTarget
+        );
         const comfortUntilRemain = formatTimeRemainingUntil(
             roomRow?.roomTargetOverrideUntilMs ?? null
         );
