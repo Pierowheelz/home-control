@@ -27,21 +27,34 @@ import WbSession from "classes/Session.jsx";
 function Admin({ router, children }) {
     const session = useContext( WbSession );
     
-    let defaultSidebarState = false; //closed by default on Mobile
-    if( typeof window != "undefined" && window.innerWidth > 768 ){
-        defaultSidebarState = true; //open by default on Tablet / Desktop
-    }
-    
     const [sessionValid, setSessionValididy] = React.useState(true);
     const [sessionErrorMsg, setSessionErrorMsg] = React.useState('');
     const [redirectToLogin, enableRedirectToLogin] = React.useState(false);
-    const [sidenavOpen, setSidenavOpen] = React.useState(defaultSidebarState);
-    if( true == sidenavOpen && typeof document != "undefined" ){
-        // Make sure body classes are correct for desktop default sidebar state
-        document.body.classList.add("g-sidenav-pinned");
-        document.body.classList.add("g-sidenav-show");
-        document.body.classList.remove("g-sidenav-hidden");
-    }
+    // Defer client-only session/window reads until after mount (SSR hydration)
+    const [mounted, setMounted] = React.useState(false);
+    const [sidenavOpen, setSidenavOpen] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+        // Open by default on tablet/desktop after mount
+        if (window.innerWidth > 768) {
+            document.body.classList.add("g-sidenav-pinned");
+            document.body.classList.add("g-sidenav-show");
+            document.body.classList.remove("g-sidenav-hidden");
+            setSidenavOpen(true);
+        }
+    }, []);
+
+    // Redirect after mount so SSR HTML matches the first client render
+    React.useEffect(() => {
+        if (!mounted) {
+            return;
+        }
+        if (redirectToLogin || !session.isLoggedIn()) {
+            session.logout();
+            router.push({pathname: '/auth/login'});
+        }
+    }, [mounted, redirectToLogin]);
     
     // Setup action upon user logged-out
     const onSessionExpiry = ( msg ) => {
@@ -56,13 +69,9 @@ function Admin({ router, children }) {
     const triggerLoginRedirect = () => {
         enableRedirectToLogin( true );
     };
-    
-    // Redirect away if user is not logged in.
-    if( typeof window !== 'undefined' && (redirectToLogin || !session.isLoggedIn()) ){
-        session.logout();
-        router.push({pathname: '/auth/login'});
-        return null;
-    }
+
+    // null userId until mounted — matches SSR (no localStorage session yet)
+    const routes = getAppRoutes(mounted ? session.getUserId() : null);
     
     const getRoutes = ( routes ) => {
         if( typeof routes == "undefined" ){
@@ -86,7 +95,6 @@ function Admin({ router, children }) {
         });
     };
     const getBrandText = (path) => {
-        const routes = getAppRoutes(session.getUserId());
         for (let i = 0; i < routes.length; i++) {
             if (router.pathname.indexOf(routes[i].layout + routes[i].path) !== -1) {
                 return routes[i].name;
@@ -117,7 +125,7 @@ function Admin({ router, children }) {
     return (
         <>
             <Sidebar
-                routes={getAppRoutes(session.getUserId())}
+                routes={routes}
                 toggleSidenav={toggleSidenav}
                 sidenavOpen={sidenavOpen}
             />

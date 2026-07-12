@@ -7,6 +7,8 @@ const runtimeCaching = require('next-pwa/cache');
 const withPWA = require('next-pwa')({
   dest: 'public',
   runtimeCaching,
+  // Avoid GenerateSW-called-multiple-times noise in `next dev` watch mode
+  disable: process.env.NODE_ENV === 'development',
 });
 
 module.exports = withPWA(withFonts(

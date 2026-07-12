@@ -40,13 +40,22 @@ function Sidebar({
     const [state, setState] = React.useState({});
     const [windowWidth, setWindowWidth] = React.useState(0);
     const [navigatorPlatform, setNavigatorPlatform] = React.useState("");
+    // Match SSR: session is only available from localStorage after mount
+    const [mounted, setMounted] = React.useState(false);
     const session = useContext( WbSession );
     React.useEffect(() => {
-        setState(getCollapseStates(routes));
+        setMounted(true);
         setWindowWidth(window.innerWidth);
         setNavigatorPlatform(navigator.platform);
         // eslint-disable-next-line
     }, []);
+    // Recompute open collapses when routes change (e.g. after session mounts)
+    React.useEffect(() => {
+        if (mounted) {
+            setState(getCollapseStates(routes));
+        }
+        // eslint-disable-next-line
+    }, [mounted, routes]);
     // verifies if routeName is the one active (in browser input)
     const activeRoute = (routeName) => {
         return router.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -93,7 +102,8 @@ function Sidebar({
             if (prop.redirect) {
                 return null;
             }
-            if( !prop.noUser && !session.isLoggedIn() ){
+            // Until mounted, treat as logged out so SSR and first client render match
+            if( !prop.noUser && !(mounted && session.isLoggedIn()) ){
                 return null; //hide this menu item if not logged in
             }
             if (prop.collapse) {

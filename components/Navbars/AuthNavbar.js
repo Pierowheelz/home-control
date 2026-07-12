@@ -52,7 +52,7 @@ function AdminNavbar({ theme, sidenavOpen, toggleSidenav }) {
                 )}
             >
                 <Container fluid>
-                    <div className="align-items-center ml-md-auto ml-md-0" navbar>
+                    <div className="align-items-center ml-md-auto ml-md-0">
                         <Media className="align-items-center">
                             <span className="avatar avatar-sm rounded-circle">
                                         

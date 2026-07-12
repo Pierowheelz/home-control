@@ -299,6 +299,43 @@ body{
     }
 }
 
+/* Light fixtures */
+.light-fixture-card{
+    position: relative;
+    .card-body{
+        min-height: 0;
+    }
+    .card-header h2{
+        font-size: $h3-font-size;
+    }
+}
+
+.light-fixture-metrics{
+    .light-fixture-status-label{
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+    }
+    .light-fixture-status-value{
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    .light-fixture-status-line{
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+}
+
+.light-fixture-slider-block{
+    .rangeslider{
+        margin: 0.35rem 0 0;
+    }
+}
+
+.light-fixture-stamp{
+    opacity: 0.85;
+}
+
 /* Global Alert banner */
 .globalAlert{
     position:fixed;

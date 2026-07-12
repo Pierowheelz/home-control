@@ -590,6 +590,137 @@ class Session {
     };
 
     /**
+     * Fetches all Zigbee light fixtures (`GET /bulbs`): target/desired/override
+     * state and per-bulb actuals (brightness, colour, linkQuality).
+     *
+     * @returns {Promise<object|false>}
+     */
+    getBulbs = async () => {
+        if (typeof window == "undefined") {
+            return false;
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: "no-store",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + this.session_id,
+                },
+                method: "put",
+                redirect: "follow",
+                referrer: "no-referrer",
+                body: JSON.stringify({
+                    endpoint: "/bulbs",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + this.session_id,
+                    },
+                }),
+            }
+        );
+
+        let ret = response;
+        if (typeof ret.json == "function") {
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        return ret;
+    };
+
+    /**
+     * Sets a fixture-level manual override (brightness + colour) and pushes
+     * commands immediately (`POST /bulbs/:fixtureId`).
+     *
+     * @param {string} fixtureId Fixture key (e.g. `"bathroom"`).
+     * @param {number} brightness Integer 0–100.
+     * @param {number} colour `0` for red RGB, or Kelvin (UI uses 2700–6500, or 0 for red).
+     * @returns {Promise<object|false>} Updated fixture snapshot, or false.
+     */
+    setBulbFixture = async (fixtureId, brightness, colour) => {
+        if (typeof window == "undefined") {
+            return false;
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: "no-store",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + this.session_id,
+                },
+                method: "post",
+                redirect: "follow",
+                referrer: "no-referrer",
+                body: JSON.stringify({
+                    endpoint: "/bulbs/" + fixtureId,
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + this.session_id,
+                    },
+                    body: {
+                        brightness: Math.round(brightness),
+                        colour: Math.round(colour),
+                    },
+                }),
+            }
+        );
+
+        let ret = response;
+        if (typeof ret.json == "function") {
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        return ret;
+    };
+
+    /**
+     * Clears a fixture's manual override and re-pushes schedule target
+     * (`POST /bulbs/:fixtureId/reset`).
+     *
+     * @param {string} fixtureId Fixture key (e.g. `"bathroom"`).
+     * @returns {Promise<object|false>} Updated fixture snapshot, or false.
+     */
+    resetBulbFixture = async (fixtureId) => {
+        if (typeof window == "undefined") {
+            return false;
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: "no-store",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + this.session_id,
+                },
+                method: "post",
+                redirect: "follow",
+                referrer: "no-referrer",
+                body: JSON.stringify({
+                    endpoint: "/bulbs/" + fixtureId + "/reset",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + this.session_id,
+                    },
+                }),
+            }
+        );
+
+        let ret = response;
+        if (typeof ret.json == "function") {
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        return ret;
+    };
+
+    /**
      * Fetches the vent automation dashboard (`GET /vents/actions`): per-room temps,
      * humidity, `wantOpen`, manual override flags, etc. Refreshes vent hardware once
      * server-side. Builds a synthetic motor `status` map from `rooms` and

@@ -18,7 +18,7 @@ import WbSession from "classes/Session.jsx";
 import SimpleHeader from "components/Headers/SimpleHeader.js";
 import LinkCard from "components/Features/LinkCard.jsx";
 
-import { faBedEmpty, faGarage, faBlinds, faComputerSpeaker, faServer, faWind } from '@fortawesome/pro-light-svg-icons';
+import { faBedEmpty, faGarage, faBlinds, faComputerSpeaker, faServer, faWind, faLightbulb } from '@fortawesome/pro-light-svg-icons';
 
 class HomePage extends Component {
     static contextType = WbSession;
@@ -69,6 +69,9 @@ class HomePage extends Component {
                         ) : null}
                         <Col id="col_vents" key="3" md="6" xl="3" onClick={() => {this.redirectToPage("vents");}}>
                             <LinkCard key="vents" id="card_vents" title="AC Vents" button="Control Vents" icon={faWind} className="bg-gradient-primary" />
+                        </Col>
+                        <Col id="col_lights" key="5" md="6" xl="3" onClick={() => {this.redirectToPage("lights");}}>
+                            <LinkCard key="lights" id="card_lights" title="Lights" button="Control Lights" icon={faLightbulb} className="bg-gradient-warning" />
                         </Col>
                         <Col id="col_garage" key="4" md="6" xl="3" onClick={() => {this.redirectToPage("garage");}}>
                             <LinkCard key="garage" id="card_garage" title="Garage" button="Control Garage" icon={faGarage} className="bg-gradient-default" />

@@ -55,6 +55,15 @@ const getAppRoutes = ( userId ) => {
             layout: "",
         }
     );
+
+    dashboardViews.push(
+        {
+            path: "/lights",
+            name: "Lights",
+            miniName: "Lgt",
+            layout: "",
+        }
+    );
     
     dashboardViews.push(
         {
