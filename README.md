@@ -1,5 +1,9 @@
 ## Home Control App
-A ReactJS webapp based on the NextJS Argon Dashboard PRO boilderplate from Creative Tim. Uses NextJS for routing. All routes are found under the pages/ directory.
+A ReactJS webapp based on the NextJS Argon Dashboard PRO boilderplate from Creative Tim. Uses NextJS for routing.
+
+After login the app loads pages, nav, and device cards from the backend (`GET /layout`, driven by `appLayout` / `devices` in `env.config.js`). Auth still lives under `pages/auth`. Everything else is a catch-all (`pages/[page].js`) plus the Apache rewrite in `public/.htaccess`.
+
+To add a room, hide the garage, or change who sees which page, edit the backend config and restart the API. See the backend README (Devices and app layout). A frontend rebuild is only needed if you add a new widget type in code.
 
 #### Development Quick Start
 

@@ -21,6 +21,8 @@ import Sidebar from "components/Sidebar/Sidebar.js";
 import getAppRoutes from "routes.js";
 //classes
 import WbSession from "classes/Session.jsx";
+import LayoutContext from "components/Layout/LayoutContext.js";
+import { currentAppPath } from "components/Layout/layoutNav.js";
 
 //import Routes from "routes.js";
 
@@ -33,6 +35,10 @@ function Admin({ router, children }) {
     // Defer client-only session/window reads until after mount (SSR hydration)
     const [mounted, setMounted] = React.useState(false);
     const [sidenavOpen, setSidenavOpen] = React.useState(false);
+    const cachedLayout = session.getCachedLayout ? session.getCachedLayout() : null;
+    const [layout, setLayout] = React.useState(cachedLayout);
+    const [layoutLoading, setLayoutLoading] = React.useState(!cachedLayout);
+    const [layoutError, setLayoutError] = React.useState('');
 
     React.useEffect(() => {
         setMounted(true);
@@ -55,6 +61,35 @@ function Admin({ router, children }) {
             router.push({pathname: '/auth/login'});
         }
     }, [mounted, redirectToLogin]);
+
+    React.useEffect(() => {
+        if (!mounted || !session.isLoggedIn()) {
+            return;
+        }
+        let cancelled = false;
+        session.getLayout().then((data) => {
+            if (cancelled) {
+                return;
+            }
+            if (data && Array.isArray(data.pages)) {
+                setLayout(data);
+                setLayoutError('');
+            } else {
+                setLayoutError(
+                    (data && (data.message || data.error)) || 'Failed to load layout.'
+                );
+            }
+            setLayoutLoading(false);
+        }).catch(() => {
+            if (!cancelled) {
+                setLayoutError('Failed to load layout.');
+                setLayoutLoading(false);
+            }
+        });
+        return () => {
+            cancelled = true;
+        };
+    }, [mounted]);
     
     // Setup action upon user logged-out
     const onSessionExpiry = ( msg ) => {
@@ -71,11 +106,11 @@ function Admin({ router, children }) {
     };
 
     // null userId until mounted — matches SSR (no localStorage session yet)
-    const routes = getAppRoutes(mounted ? session.getUserId() : null);
+    const routes = getAppRoutes(layout);
     
     const getRoutes = ( routes ) => {
         if( typeof routes == "undefined" ){
-            var routes = getAppRoutes(session.getUserId());
+            var routes = getAppRoutes(layout);
         }
         return routes.map((prop, key) => {
             if (prop.collapse) {
@@ -95,10 +130,10 @@ function Admin({ router, children }) {
         });
     };
     const getBrandText = (path) => {
-        for (let i = 0; i < routes.length; i++) {
-            if (router.pathname.indexOf(routes[i].layout + routes[i].path) !== -1) {
-                return routes[i].name;
-            }
+        const pages = Array.isArray(layout?.pages) ? layout.pages : [];
+        const match = pages.find((page) => page.path === path);
+        if (match) {
+            return match.navName || match.id;
         }
         return "Brand";
     };
@@ -122,8 +157,9 @@ function Admin({ router, children }) {
     };
     
     console.log('sidebar state: ', sidenavOpen);
+    const brandPath = mounted ? currentAppPath() : router.pathname;
     return (
-        <>
+        <LayoutContext.Provider value={{ layout, layoutLoading, layoutError }}>
             <Sidebar
                 routes={routes}
                 toggleSidenav={toggleSidenav}
@@ -134,7 +170,7 @@ function Admin({ router, children }) {
                     theme={getNavbarTheme()}
                     toggleSidenav={toggleSidenav}
                     sidenavOpen={sidenavOpen}
-                    brandText={getBrandText(router.pathname)}
+                    brandText={getBrandText(brandPath)}
                 />
                 {children}
                 <Footer />
@@ -151,7 +187,7 @@ function Admin({ router, children }) {
                     <Button color="primary" onClick={triggerLoginRedirect}>Log In</Button>{' '}
                 </ModalFooter>
             </Modal>
-        </>
+        </LayoutContext.Provider>
     );
 }
 

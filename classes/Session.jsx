@@ -23,6 +23,7 @@ class Session {
         this.push_key = null;
         this.sessionError = function(e){};
         this.is_logging_in = false;
+        this._layout = null;
         
         this.restoreSession();
     }
@@ -67,6 +68,7 @@ class Session {
             this.session_id = ret.accessToken;
             this.refreshToken = ret.refreshToken;
             this.user_id = ret.userId ?? null;
+            this._layout = null;
             this.save_session( this.session_id, this.user_id );
             
             //const key = await this.getPushKey();
@@ -117,6 +119,63 @@ class Session {
         }
         this.check_session(ret);
         
+        return ret;
+    };
+
+    /**
+     * Cached GET /layout payload, or null if not fetched yet.
+     *
+     * @returns {{ nav?: object, pages?: object[] }|null}
+     */
+    getCachedLayout = () => {
+        return this._layout;
+    };
+
+    /**
+     * Fetch the deployment UI layout (pages, nav, widgets). Uses the in-memory
+     * cache after the first successful call for this login.
+     *
+     * @returns {Promise<{ nav?: object, pages?: object[] }|false>}
+     */
+    getLayout = async () => {
+        if( typeof window == "undefined" ){
+            return false;
+        }
+        if( this._layout ){
+            return this._layout;
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: 'no-store',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+this.session_id,
+                },
+                method: 'put',
+                redirect: 'follow',
+                referrer: 'no-referrer',
+                body: JSON.stringify({
+                    endpoint: "/layout",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer '+this.session_id,
+                    },
+                })
+            }
+        );
+
+        let ret = response;
+        if( typeof ret.json == "function" ){
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        if( ret && Array.isArray(ret.pages) ){
+            this._layout = ret;
+        }
+
         return ret;
     };
     
@@ -925,6 +984,100 @@ class Session {
 
         return ret;
     };
+
+    /**
+     * Forces vent automation into cooling or heating temporarily (`POST /vents/hvac-mode`).
+     *
+     * @param {'cooling'|'heating'} mode Forced HVAC mode.
+     * @param {number} [durationMs] Optional override duration in milliseconds.
+     * @returns {Promise<object|false>}
+     */
+    setVentHvacMode = async (mode, durationMs) => {
+        if (typeof window === "undefined") {
+            return false;
+        }
+
+        /** @type {{ mode: string, duration?: number }} */
+        const innerBody = { mode };
+        if (
+            typeof durationMs === "number" &&
+            Number.isFinite(durationMs) &&
+            durationMs >= 0
+        ) {
+            innerBody.duration = Math.round(durationMs);
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: "no-store",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + this.session_id,
+                },
+                method: "post",
+                redirect: "follow",
+                referrer: "no-referrer",
+                body: JSON.stringify({
+                    endpoint: "/vents/hvac-mode",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + this.session_id,
+                    },
+                    body: innerBody,
+                }),
+            }
+        );
+
+        let ret = response;
+        if (typeof ret.json == "function") {
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        return ret;
+    };
+
+    /**
+     * Clears the active temporary HVAC mode override (`POST /vents/hvac-mode` with cancel).
+     *
+     * @returns {Promise<object|false>}
+     */
+    cancelVentHvacMode = async () => {
+        if (typeof window === "undefined") {
+            return false;
+        }
+
+        const response = await this._fetchWithTimeout(
+            this.url,
+            {
+                cache: "no-store",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + this.session_id,
+                },
+                method: "post",
+                redirect: "follow",
+                referrer: "no-referrer",
+                body: JSON.stringify({
+                    endpoint: "/vents/hvac-mode",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + this.session_id,
+                    },
+                    body: { cancel: true },
+                }),
+            }
+        );
+
+        let ret = response;
+        if (typeof ret.json == "function") {
+            ret = await response.json();
+        }
+        this.check_session(ret);
+
+        return ret;
+    };
     
     /**
      * Gets Server Controller state.
@@ -1219,6 +1372,7 @@ class Session {
         this.user_id = null;
         this.session_id = null;
         this.push_key = null;
+        this._layout = null;
         
         //this.unSubscribeToPush();
 	}

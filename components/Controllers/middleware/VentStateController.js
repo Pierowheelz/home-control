@@ -61,6 +61,8 @@ export default class VentStateController extends Component {
         roomsByMotorId: {},
         controllerTempC: null,
         mode: "unknown",
+        hvacModeOverride: null,
+        hvacModeOverrideUntilMs: null,
         targets: null,
         actions: [],
         statistics: null,
@@ -120,6 +122,8 @@ export default class VentStateController extends Component {
                 roomsByMotorId: {},
                 controllerTempC: null,
                 mode: "unknown",
+                hvacModeOverride: null,
+                hvacModeOverrideUntilMs: null,
                 targets: null,
                 actions: [],
                 statistics: null,
@@ -139,6 +143,8 @@ export default class VentStateController extends Component {
             roomsByMotorId: { ...this.state.roomsByMotorId },
             controllerTempC: this.state.controllerTempC,
             mode: this.state.mode,
+            hvacModeOverride: this.state.hvacModeOverride,
+            hvacModeOverrideUntilMs: this.state.hvacModeOverrideUntilMs,
             targets: this.state.targets,
             actions: this.state.actions,
             statistics: this.state.statistics,
@@ -160,6 +166,16 @@ export default class VentStateController extends Component {
                     : null;
             newState.mode =
                 typeof response.mode === "string" ? response.mode : "unknown";
+            newState.hvacModeOverride =
+                response.hvacModeOverride === "cooling" ||
+                response.hvacModeOverride === "heating"
+                    ? response.hvacModeOverride
+                    : null;
+            newState.hvacModeOverrideUntilMs =
+                typeof response.hvacModeOverrideUntilMs === "number" &&
+                Number.isFinite(response.hvacModeOverrideUntilMs)
+                    ? response.hvacModeOverrideUntilMs
+                    : null;
             newState.targets =
                 response.targets != null &&
                 typeof response.targets === "object" &&

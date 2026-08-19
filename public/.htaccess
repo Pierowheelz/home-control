@@ -1,0 +1,14 @@
+RewriteEngine On
+RewriteBase /
+
+# Existing files (Next static assets, exported HTML, etc.)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Next.js `next export` pages as .html
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# Pretty app slugs → catch-all page (dummy path from getStaticPaths)
+RewriteRule ^[A-Za-z0-9_-]+/?$ /_.html [L]

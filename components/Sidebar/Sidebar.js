@@ -25,6 +25,7 @@ import {
 } from "reactstrap";
 //classes
 import WbSession from "classes/Session.jsx";
+import { pageHref, currentAppPath } from "components/Layout/layoutNav.js";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleRight } from '@fortawesome/pro-light-svg-icons';
@@ -58,7 +59,11 @@ function Sidebar({
     }, [mounted, routes]);
     // verifies if routeName is the one active (in browser input)
     const activeRoute = (routeName) => {
-        return router.pathname.indexOf(routeName) > -1 ? "active" : "";
+        const path = mounted ? currentAppPath() : (router.asPath || '').split('?')[0];
+        if (routeName === '/') {
+            return path === '/' ? "active" : "";
+        }
+        return path === routeName ? "active" : "";
     };
     // this creates the intial state of this component based on the collapse routes
     // that it gets through props.routes
@@ -80,10 +85,11 @@ function Sidebar({
     // for example, on the refresh of the page,
     // while on the src/views/forms/RegularForms.js - route /admin/regular-forms
     const getCollapseInitialState = (routes) => {
+        const path = mounted ? currentAppPath() : (router.asPath || '').split('?')[0];
         for (let i = 0; i < routes.length; i++) {
             if (routes[i].collapse && getCollapseInitialState(routes[i].views)) {
                 return true;
-            } else if (router.pathname.indexOf(routes[i].path) !== -1) {
+            } else if (routes[i].path === '/' ? path === '/' : path === routes[i].path) {
                 return true;
             }
         }
@@ -144,9 +150,10 @@ function Sidebar({
                     </NavItem>
                 );
             }
+            const href = pageHref(prop.layout + prop.path);
             return (
                 <NavItem className={activeRoute(prop.layout + prop.path)} key={key}>
-                    <Link href={prop.layout + prop.path}><NavLink href="#link" onClick={closeSidenav}>
+                    <Link href={href.href} as={href.as}><NavLink href="#link" onClick={closeSidenav}>
                             {prop.icon !== undefined ? (
                                 <>
                                     <FontAwesomeIcon className="menuIcon" icon={prop.icon} />

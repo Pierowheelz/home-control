@@ -72,6 +72,8 @@ import { createContext } from "react";
  * @property {Record<string, VentRoomDashboardRow>} roomsByMotorId Latest room row per motor id (string key).
  * @property {number|null} controllerTempC
  * @property {'idle'|'cooling'|'heating'|'unknown'|'disabled'|string} mode
+ * @property {'cooling'|'heating'|null} hvacModeOverride Active forced mode, or null if none / expired.
+ * @property {number|null} hvacModeOverrideUntilMs Epoch ms when the mode override expires; null if none.
  * @property {{ coolTargetC?: number, heatTargetC?: number, roomHysteresisC?: number }|null} targets
  * @property {VentActionLogEntry[]} actions Newest first.
  * @property {VentDashboardStatistics|null} statistics

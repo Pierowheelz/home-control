@@ -1,0 +1,1 @@
+(()=>{"use strict";self.fallback=async e=>"document"===e.destination?caches.match("/_.html",{ignoreSearch:!0}):Response.error()})();

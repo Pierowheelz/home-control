@@ -1,33 +1,23 @@
-/*!
- * Zigbee light fixtures dashboard
- */
-import React, { Component } from "react";
+import React from "react";
+import { Row, Col } from "reactstrap";
 
-import { Container, Row, Col } from "reactstrap";
-
-import Admin from "layouts/Admin.js";
-import SimpleHeader from "components/Headers/SimpleHeader.js";
 import LightFixture from "components/Controllers/LightFixture.js";
-import LightFixtureStateController from "components/Controllers/middleware/LightFixtureStateController.js";
 import { LightFixtureStateContext } from "components/Controllers/middleware/LightFixtureStateContext.js";
-
-/** Display titles for known fixture ids. */
-const FIXTURE_TITLES = {
-    bathroom: "Bathroom",
-};
 
 /**
  * Humanize a fixtureId when no title map entry exists.
  *
  * @param {string} fixtureId
+ * @param {Record<string, string>} [titles]
  * @returns {string}
  */
-function titleForFixtureId(fixtureId) {
+export function titleForFixtureId(fixtureId, titles) {
     if (
-        Object.prototype.hasOwnProperty.call(FIXTURE_TITLES, fixtureId) &&
-        FIXTURE_TITLES[fixtureId]
+        titles &&
+        Object.prototype.hasOwnProperty.call(titles, fixtureId) &&
+        titles[fixtureId]
     ) {
-        return FIXTURE_TITLES[fixtureId];
+        return titles[fixtureId];
     }
     if (!fixtureId) {
         return "Light";
@@ -38,9 +28,10 @@ function titleForFixtureId(fixtureId) {
 /**
  * Renders one card per fixture from the shared poll context.
  *
+ * @param {{ titles?: Record<string, string> }} props
  * @returns {import("react").ReactNode}
  */
-function LightFixtureGrid() {
+export default function LightFixtureGrid({ titles }) {
     return (
         <LightFixtureStateContext.Consumer>
             {(fetchState) => {
@@ -75,7 +66,7 @@ function LightFixtureGrid() {
                             >
                                 <LightFixture
                                     fixtureId={fixtureId}
-                                    title={titleForFixtureId(fixtureId)}
+                                    title={titleForFixtureId(fixtureId, titles)}
                                 />
                             </Col>
                         ))}
@@ -85,22 +76,3 @@ function LightFixtureGrid() {
         </LightFixtureStateContext.Consumer>
     );
 }
-
-class Page extends Component {
-    render() {
-        return (
-            <>
-                <SimpleHeader />
-                <Container className="mt--6" fluid>
-                    <LightFixtureStateController>
-                        <LightFixtureGrid />
-                    </LightFixtureStateController>
-                </Container>
-            </>
-        );
-    }
-}
-
-Page.layout = Admin;
-
-export default Page;
