@@ -33,6 +33,8 @@ module.exports = withPWA(withFonts(
             'public_url': process.env.PUBLIC_URL,
             'api_url': process.env.REACT_APP_ENDPOINT_URL,
             //'api_bak_url': process.env.REACT_APP_ENDPOINT_URL_BAK
+            // strings so webpack inlining does not turn false into `false !== 'false'`
+            'use_proxy': process.env.USE_PROXY === 'false' ? 'false' : 'true',
         }
     }
 ));

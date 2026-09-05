@@ -15,7 +15,8 @@ class Session {
         //this.primary_url = process.env.api_url + "";
         //this.backup_url = process.env.api_bak_url + "";
         
-        this.url = "https://pwproxy.webbird.info/index.php";//this.primary_url; //process.env.api_url +
+        this.use_proxy = String(process.env.use_proxy) !== 'false';
+        this.url = process.env.api_url || "https://pwproxy.webbird.info/index.php";
         
         this.session_id = null;
         this.refreshToken = null;
@@ -1231,7 +1232,32 @@ class Session {
         return ret;
     };
     
+    /**
+     * Fetch with a 16s abort. When USE_PROXY is false, unwraps the proxy
+     * payload and calls the API origin directly (PUT → GET, POST → POST).
+     *
+     * @param {string} url
+     * @param {RequestInit} options
+     * @returns {Promise<Response|{code: string, success: boolean, message?: string}|false>}
+     */
     _fetchWithTimeout = (url, options) => {
+        if( !this.use_proxy && options && typeof options.body === 'string' ){
+            try {
+                const wrapped = JSON.parse(options.body);
+                if( wrapped.endpoint ){
+                    url = this.url.replace(/\/$/, '') + wrapped.endpoint;
+                    const isPut = String(options.method || '').toLowerCase() === 'put';
+                    const hasBody = wrapped.body !== undefined && wrapped.body !== null && wrapped.body !== '';
+                    options = {
+                        ...options,
+                        method: isPut ? 'GET' : options.method,
+                        headers: wrapped.headers || options.headers,
+                        body: (!isPut && hasBody) ? JSON.stringify(wrapped.body) : undefined,
+                    };
+                }
+            } catch (e) {}
+        }
+
         console.log('Fetch command issued: ', url);
         
         const controller = new AbortController();

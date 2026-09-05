@@ -1,5 +1,13 @@
+DirectoryIndex index.html
+Options -Indexes
+ErrorDocument 404 /404.html
+
 RewriteEngine On
 RewriteBase /
+
+# HTTP → HTTPS (host from the request, not hardcoded)
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
 # Existing files (Next static assets, exported HTML, etc.)
 RewriteCond %{REQUEST_FILENAME} -f [OR]
