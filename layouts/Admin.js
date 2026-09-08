@@ -66,6 +66,13 @@ function Admin({ router, children }) {
         if (!mounted || !session.isLoggedIn()) {
             return;
         }
+        const persisted = session.readPersistedLayout
+            ? session.readPersistedLayout()
+            : null;
+        if (persisted) {
+            setLayout(persisted);
+            setLayoutLoading(false);
+        }
         let cancelled = false;
         session.getLayout().then((data) => {
             if (cancelled) {
@@ -74,14 +81,14 @@ function Admin({ router, children }) {
             if (data && Array.isArray(data.pages)) {
                 setLayout(data);
                 setLayoutError('');
-            } else {
+            } else if (!persisted) {
                 setLayoutError(
                     (data && (data.message || data.error)) || 'Failed to load layout.'
                 );
             }
             setLayoutLoading(false);
         }).catch(() => {
-            if (!cancelled) {
+            if (!cancelled && !persisted) {
                 setLayoutError('Failed to load layout.');
                 setLayoutLoading(false);
             }
@@ -90,6 +97,25 @@ function Admin({ router, children }) {
             cancelled = true;
         };
     }, [mounted]);
+
+    /**
+     * Force a network refetch of GET /layout and update context state.
+     *
+     * @returns {Promise<{ nav?: object, pages?: object[] }|false>}
+     */
+    const reloadLayout = React.useCallback(async () => {
+        const data = await session.refreshLayout();
+        if (data && Array.isArray(data.pages)) {
+            setLayout(data);
+            setLayoutError('');
+            setLayoutLoading(false);
+            return data;
+        }
+        const message =
+            (data && (data.message || data.error)) || 'Failed to load layout.';
+        setLayoutError(message);
+        return false;
+    }, [session]);
     
     // Setup action upon user logged-out
     const onSessionExpiry = ( msg ) => {
@@ -159,7 +185,7 @@ function Admin({ router, children }) {
     console.log('sidebar state: ', sidenavOpen);
     const brandPath = mounted ? currentAppPath() : router.pathname;
     return (
-        <LayoutContext.Provider value={{ layout, layoutLoading, layoutError }}>
+        <LayoutContext.Provider value={{ layout, layoutLoading, layoutError, reloadLayout }}>
             <Sidebar
                 routes={routes}
                 toggleSidenav={toggleSidenav}

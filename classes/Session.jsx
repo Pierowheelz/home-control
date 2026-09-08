@@ -8,6 +8,15 @@ import Storage from "classes/Storage.jsx";
 let wbStorage = new Storage();
 //let wbPush = new Push();
 
+/** localStorage key for persisted GET /layout JSON. */
+const LAYOUT_STORAGE_KEY = 'appLayout';
+/** localStorage key for the SW scriptURL that last saved the layout. */
+const LAYOUT_SW_STAMP_KEY = 'appLayoutSw';
+/** localStorage key for when the layout was saved (used when no SW is controlling). */
+const LAYOUT_SAVED_AT_KEY = 'appLayoutSavedAt';
+/** Layout cache lifetime when no service worker is controlling the page. */
+const LAYOUT_TTL_MS = 365 * 24 * 60 * 60 * 1000;
+
 class Session {
     constructor() {
         this.logging = true;
@@ -25,8 +34,10 @@ class Session {
         this.sessionError = function(e){};
         this.is_logging_in = false;
         this._layout = null;
+        this._swLayoutBound = false;
         
         this.restoreSession();
+        this._bindSwLayoutInvalidation();
     }
     
     /**
@@ -133,17 +144,120 @@ class Session {
     };
 
     /**
-     * Fetch the deployment UI layout (pages, nav, widgets). Uses the in-memory
-     * cache after the first successful call for this login.
+     * Script URL of the controlling service worker, or '' when none.
      *
+     * @returns {string}
+     */
+    _currentSwStamp = () => {
+        if( typeof navigator == "undefined" || !navigator.serviceWorker ){
+            return '';
+        }
+        const controller = navigator.serviceWorker.controller;
+        return (controller && controller.scriptURL) ? controller.scriptURL : '';
+    };
+
+    /**
+     * Write layout JSON plus SW stamp / saved-at to localStorage.
+     *
+     * @param {{ nav?: object, pages?: object[] }} layout
+     */
+    _persistLayout = ( layout ) => {
+        if( typeof window == "undefined" ){
+            return;
+        }
+        wbStorage.set_item( LAYOUT_STORAGE_KEY, JSON.stringify(layout) );
+        wbStorage.set_item( LAYOUT_SW_STAMP_KEY, this._currentSwStamp() );
+        wbStorage.set_item( LAYOUT_SAVED_AT_KEY, String(Date.now()) );
+    };
+
+    /**
+     * Drop the durable layout cache. Does not clear in-memory `_layout`.
+     */
+    _clearPersistedLayout = () => {
+        wbStorage.delete_item( LAYOUT_STORAGE_KEY );
+        wbStorage.delete_item( LAYOUT_SW_STAMP_KEY );
+        wbStorage.delete_item( LAYOUT_SAVED_AT_KEY );
+    };
+
+    /**
+     * Drop memory and durable layout when a new service worker takes control.
+     */
+    _bindSwLayoutInvalidation = () => {
+        if( typeof window == "undefined" || this._swLayoutBound ){
+            return;
+        }
+        if( !('serviceWorker' in navigator) ){
+            return;
+        }
+        this._swLayoutBound = true;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            this._layout = null;
+            this._clearPersistedLayout();
+        });
+    };
+
+    /**
+     * Layout stored from a previous load, if the SW stamp (or 1-year TTL with
+     * no SW) still matches. Hydrates `_layout` when valid.
+     *
+     * @returns {{ nav?: object, pages?: object[] }|null}
+     */
+    readPersistedLayout = () => {
+        if( typeof window == "undefined" ){
+            return null;
+        }
+        const raw = wbStorage.get_item( LAYOUT_STORAGE_KEY );
+        if( !raw || raw === 'null' ){
+            return null;
+        }
+        let parsed;
+        try {
+            parsed = JSON.parse(raw);
+        } catch (e) {
+            this._clearPersistedLayout();
+            return null;
+        }
+        if( !parsed || !Array.isArray(parsed.pages) ){
+            this._clearPersistedLayout();
+            return null;
+        }
+
+        const current = this._currentSwStamp();
+        if( current ){
+            const storedStamp = wbStorage.get_item( LAYOUT_SW_STAMP_KEY );
+            if( storedStamp !== current ){
+                return null;
+            }
+        } else {
+            const savedAt = Number(wbStorage.get_item( LAYOUT_SAVED_AT_KEY ));
+            if( !savedAt || (Date.now() - savedAt) > LAYOUT_TTL_MS ){
+                return null;
+            }
+        }
+
+        this._layout = parsed;
+        return parsed;
+    };
+
+    /**
+     * Fetch the deployment UI layout (pages, nav, widgets). Uses in-memory
+     * then durable cache unless `force` is true.
+     *
+     * @param {boolean} [force]
      * @returns {Promise<{ nav?: object, pages?: object[] }|false>}
      */
-    getLayout = async () => {
+    getLayout = async ( force ) => {
         if( typeof window == "undefined" ){
             return false;
         }
-        if( this._layout ){
+        if( !force && this._layout ){
             return this._layout;
+        }
+        if( !force ){
+            const persisted = this.readPersistedLayout();
+            if( persisted ){
+                return persisted;
+            }
         }
 
         const response = await this._fetchWithTimeout(
@@ -175,9 +289,19 @@ class Session {
 
         if( ret && Array.isArray(ret.pages) ){
             this._layout = ret;
+            this._persistLayout(ret);
         }
 
         return ret;
+    };
+
+    /**
+     * Fetch layout from the API, replacing memory and durable caches.
+     *
+     * @returns {Promise<{ nav?: object, pages?: object[] }|false>}
+     */
+    refreshLayout = async () => {
+        return this.getLayout(true);
     };
     
     register = async ( fname, lname, email, pass ) => {

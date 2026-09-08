@@ -27,8 +27,10 @@ import {
 import WbSession from "classes/Session.jsx";
 import { pageHref, currentAppPath } from "components/Layout/layoutNav.js";
 
+import LayoutContext from "components/Layout/LayoutContext.js";
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleRight } from '@fortawesome/pro-light-svg-icons';
+import { faAngleRight, faRotateRight } from '@fortawesome/pro-light-svg-icons';
 
 function Sidebar({
     toggleSidenav,
@@ -43,7 +45,9 @@ function Sidebar({
     const [navigatorPlatform, setNavigatorPlatform] = React.useState("");
     // Match SSR: session is only available from localStorage after mount
     const [mounted, setMounted] = React.useState(false);
+    const [reloading, setReloading] = React.useState(false);
     const session = useContext( WbSession );
+    const { reloadLayout } = useContext( LayoutContext );
     React.useEffect(() => {
         setMounted(true);
         setWindowWidth(window.innerWidth);
@@ -101,6 +105,21 @@ function Sidebar({
         if (windowWidth < 1200) {
             toggleSidenav();
         }
+    };
+    /**
+     * Force a layout refetch from the API.
+     *
+     * @param {Event} e
+     */
+    const onReloadLayout = (e) => {
+        e.preventDefault();
+        if (reloading || !reloadLayout) {
+            return;
+        }
+        setReloading(true);
+        reloadLayout().finally(() => {
+            setReloading(false);
+        });
     };
     // this function creates the links and collapses that appear in the sidebar (left menu)
     const createLinks = (routes) => {
@@ -221,13 +240,27 @@ function Sidebar({
     );
     return (
         <Navbar
-            className="sidenav navbar-vertical navbar-expand-xs navbar-light bg-white fixed-left"
+            className={classnames(
+                "sidenav navbar-vertical navbar-expand-xs navbar-light bg-white fixed-left",
+                { "sidenav-has-reload": mounted && session.isLoggedIn() }
+            )}
         >
             {navigatorPlatform && navigatorPlatform.indexOf("Win") > -1 ? (
                 <PerfectScrollbar>{scrollBarInner}</PerfectScrollbar>
             ) : (
                 scrollBarInner
             )}
+            {mounted && session.isLoggedIn() ? (
+                <button
+                    type="button"
+                    className="sidenav-reload-layout"
+                    title="Reload layout"
+                    aria-label="Reload layout"
+                    onClick={onReloadLayout}
+                >
+                    <FontAwesomeIcon icon={faRotateRight} spin={reloading} />
+                </button>
+            ) : null}
         </Navbar>
     );
 }

@@ -6,6 +6,7 @@ import React from "react";
  *   layout: AppLayout|null,
  *   layoutLoading: boolean,
  *   layoutError: string,
+ *   reloadLayout: () => Promise<AppLayout|false>,
  * }} LayoutContextValue
  */
 
@@ -14,6 +15,7 @@ const defaultValue = {
     layout: null,
     layoutLoading: true,
     layoutError: '',
+    reloadLayout: async () => false,
 };
 
 const LayoutContext = React.createContext(defaultValue);
